@@ -1,0 +1,2 @@
+const technologies = ["NEXT.JS", "REACT", "TYPESCRIPT", "TAILWIND", "GSAP", "THREE.JS", "VERCEL"];
+export function TechStrip() { return <section className="tech-band" aria-label="Tecnologias e princípios"><div className="tech-marquee"><div>{[...technologies, ...technologies].map((tech, index) => <span key={`${tech}-${index}`}>{tech}<i>✦</i></span>)}</div></div><div className="credibility"><span>01 / Foco em performance</span><span>02 / Design responsivo</span><span>03 / Código escalável</span></div></section>; }
