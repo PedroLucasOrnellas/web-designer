@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { MotionEngine } from "@/components/motion/MotionEngine";
-import { Hero } from "@/components/sections/Hero";
+import { HeroConcept } from "@/components/hero-concept/HeroConcept";
 import { TechStrip } from "@/components/sections/TechStrip";
 import { ProjectsShowcase } from "@/components/sections/ProjectsShowcase";
 import { Manifesto } from "@/components/sections/Manifesto";
@@ -17,5 +17,5 @@ export const metadata: Metadata = {
 };
 
 export default function Home() {
-  return <><MotionEngine /><Header /><main><Hero /><TechStrip /><ProjectsShowcase /><Manifesto /><Services /><Process /><About /><FinalCTA /></main><Footer /></>;
+  return <><MotionEngine /><Header revealAfterHero /><main><HeroConcept /><TechStrip /><ProjectsShowcase /><Manifesto /><Services /><Process /><About /><FinalCTA /></main><Footer /></>;
 }

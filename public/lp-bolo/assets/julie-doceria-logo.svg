@@ -1,0 +1,8 @@
+<svg width="360" height="150" viewBox="0 0 360 150" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">Julie Doceria</title>
+  <desc id="desc">Logo Julie Doceria em marrom sobre fundo transparente.</desc>
+  <g fill="#5b310f">
+    <text x="180" y="86" text-anchor="middle" font-family="Brush Script MT, Segoe Script, Snell Roundhand, cursive" font-size="76" font-weight="700" letter-spacing="-3">Julie</text>
+    <text x="180" y="114" text-anchor="middle" font-family="Jost, Montserrat, Arial, sans-serif" font-size="20" font-weight="600" letter-spacing="4">DOCERIA</text>
+  </g>
+</svg>

@@ -1,91 +1,71 @@
 import assert from "node:assert/strict";
-import { access, readFile, readdir } from "node:fs/promises";
+import { access, readFile } from "node:fs/promises";
 import test from "node:test";
 
-const developmentPreviewMeta =
-  /<meta(?=[^>]*\bname=["']codex-preview["'])(?=[^>]*\bcontent=["']development["'])[^>]*>/i;
-const templateRoot = new URL("../", import.meta.url);
-const previewRoot = new URL("../app/_sites-preview/", import.meta.url);
-
-async function render() {
+async function render(pathname = "/") {
   const workerUrl = new URL("../dist/server/index.js", import.meta.url);
-  workerUrl.searchParams.set("test", `${process.pid}-${Date.now()}`);
+  workerUrl.searchParams.set("test", `${process.pid}-${Date.now()}-${pathname}`);
   const { default: worker } = await import(workerUrl.href);
 
   return worker.fetch(
-    new Request("http://localhost/", {
-      headers: { accept: "text/html" },
-    }),
-    {
-      ASSETS: {
-        fetch: async () => new Response("Not found", { status: 404 }),
-      },
-    },
-    {
-      waitUntil() {},
-      passThroughOnException() {},
-    },
+    new Request(`http://localhost${pathname}`, { headers: { accept: "text/html" } }),
+    { ASSETS: { fetch: async () => new Response("Not found", { status: 404 }) } },
+    { waitUntil() {}, passThroughOnException() {} },
   );
 }
 
-test("server-renders the starter loading skeleton", async () => {
+test("server-renders the stabilized portfolio structure", async () => {
   const response = await render();
   assert.equal(response.status, 200);
   assert.match(response.headers.get("content-type") ?? "", /^text\/html\b/i);
 
   const html = await response.text();
-  assert.match(html, developmentPreviewMeta);
-  assert.match(html, /<title>Your site is taking shape<\/title>/i);
-  assert.match(html, /Building your site/);
-  assert.match(html, /Your site is taking shape/);
-  assert.match(
-    html,
-    /Your first version will appear here automatically when it’s ready\./,
-  );
-  assert.doesNotMatch(html, /Codex/);
-  assert.match(html, /react-loading-skeleton/);
-  assert.match(html, /role="status"/);
+  assert.match(html, /<title>Pedro Lucas/);
+  assert.match(html, /data-motion-hero/);
+  assert.match(html, /class="hero-pin"/);
+  assert.match(html, /class="hero-title"/);
+  assert.match(html, /class="laptop-wrapper"/);
+  assert.match(html, /data-laptop-screen/);
+  assert.match(html, /data-takeover-content/);
+  assert.match(html, /class="projects-stage"/);
+  assert.match(html, /data-projects-stage/);
+  assert.match(html, /href="https:\/\/pedrolucasornellas\.github\.io\//);
+  assert.match(html, /href="\/lp-bolo\/index\.html"/);
+  assert.doesNotMatch(html, /data-preloader|data-scramble|data-case-transition/);
 });
 
-test("keeps the loading skeleton scoped and disposable", async () => {
-  const [preview, css, page, layout, packageJson, files] = await Promise.all([
-    readFile(new URL("SkeletonPreview.tsx", previewRoot), "utf8"),
-    readFile(new URL("preview.css", previewRoot), "utf8"),
-    readFile(new URL("../app/page.tsx", import.meta.url), "utf8"),
-    readFile(new URL("../app/layout.tsx", import.meta.url), "utf8"),
-    readFile(new URL("../package.json", import.meta.url), "utf8"),
-    readdir(previewRoot),
+test("keeps motion isolated, native-scroll based and reduced-motion safe", async () => {
+  const [engine, css, hero, cakeLandingPage] = await Promise.all([
+    readFile(new URL("../components/motion/MotionEngine.tsx", import.meta.url), "utf8"),
+    readFile(new URL("../app/globals.css", import.meta.url), "utf8"),
+    readFile(new URL("../components/sections/Hero.tsx", import.meta.url), "utf8"),
+    access(new URL("../public/lp-bolo/index.html", import.meta.url)),
   ]);
 
-  assert.deepEqual(files.sort(), ["SkeletonPreview.tsx", "preview.css"]);
-  assert.match(preview, /from "react-loading-skeleton"/);
-  assert.match(preview, /baseColor="#eceae7"/);
-  assert.match(preview, /highlightColor="#f9f8f6"/);
-  assert.match(preview, /duration=\{2\.8\}/);
-  assert.match(preview, /sites-skeleton-search-placeholder/);
-  assert.match(packageJson, /"react-loading-skeleton": "3\.5\.0"/);
+  assert.match(engine, /useLayoutEffect/);
+  assert.match(engine, /import\("gsap"\)/);
+  assert.match(engine, /import\("gsap\/ScrollTrigger"\)/);
+  assert.match(engine, /document\.fonts\.ready/);
+  assert.match(engine, /criticalImages/);
+  assert.match(engine, /gsap\.context/);
+  assert.match(engine, /gsap\.matchMedia/);
+  assert.match(engine, /prefers-reduced-motion:\s*reduce/);
+  assert.match(engine, /debug-motion/);
+  assert.doesNotMatch(engine, /import\("lenis"\)|SCRAMBLE_CHARS|data-page-transition-overlay/);
+  assert.match(css, /\.hero-title\{max-width:11ch/);
+  assert.match(css, /\.projects-stage\{position:relative/);
+  assert.match(css, /@media\(prefers-reduced-motion:reduce\)/);
+  assert.match(hero, /data-hero-pin/);
+  assert.match(hero, /data-takeover-content/);
+  assert.equal(cakeLandingPage, undefined);
+});
 
-  const shellIndex = preview.indexOf('className="sites-skeleton-shell"');
-  const statusIndex = preview.indexOf('className="sites-skeleton-status"');
-  assert.ok(shellIndex >= 0 && statusIndex > shellIndex);
-  assert.match(css, /position:\s*fixed/);
-  assert.match(css, /inset:\s*0/);
-  assert.match(css, /opacity:\s*0\.52/);
-  assert.match(css, /prefers-reduced-motion:\s*reduce/);
-  assert.doesNotMatch(css, /#020617|canvas|pets|progress/i);
-  assert.doesNotMatch(
-    preview,
-    /loading-spinner|status-mark|status-progress|canvas|cookie|random/i,
-  );
-
-  assert.match(page, /export const metadata:\s*Metadata/);
-  assert.match(page, /"codex-preview": "development"/);
-  assert.match(page, /<SkeletonPreview \/>/);
-  assert.match(layout, /title:\s*"Starter Project"/);
-  assert.doesNotMatch(layout, /codex-preview|_sites-preview|themeColor|\bViewport\b/);
-  assert.doesNotMatch(css, /(^|\s)(html|body)\s*\{/m);
-
-  await assert.rejects(
-    access(new URL("public/_sites-preview", templateRoot)),
-  );
+test("server-renders project cases without transition overlays", async () => {
+  const response = await render("/projetos/the-human-dataset");
+  assert.equal(response.status, 200);
+  const html = await response.text();
+  assert.match(html, /The Human Dataset/);
+  assert.match(html, /class="case-project-visual"/);
+  assert.match(html, /class="next-case"/);
+  assert.doesNotMatch(html, /data-case-mask|data-case-transition/);
 });

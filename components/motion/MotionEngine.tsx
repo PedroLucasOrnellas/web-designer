@@ -1,73 +1,184 @@
 "use client";
 
-import { useEffect } from "react";
+import { useLayoutEffect } from "react";
 
 export function MotionEngine() {
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
     let cancelled = false;
-    let cleanup = () => {};
+    let dispose = () => {};
 
-    Promise.all([import("gsap"), import("gsap/ScrollTrigger"), import("lenis")]).then(([gsapModule, scrollModule, lenisModule]) => {
+    const initialize = async () => {
+      const [gsapModule, scrollModule] = await Promise.all([import("gsap"), import("gsap/ScrollTrigger")]);
+      await document.fonts.ready;
+      const conceptHero = document.querySelector<HTMLElement>("[data-hero-concept]");
+      if (conceptHero && document.documentElement.dataset.heroConceptReady !== "true") {
+        await new Promise<void>((resolve) => {
+          const fallback = window.setTimeout(resolve, 2500);
+          window.addEventListener("hero-concept-ready", () => {
+            window.clearTimeout(fallback);
+            resolve();
+          }, { once: true });
+        });
+      }
+      const criticalImages = Array.from(document.querySelectorAll<HTMLImageElement>("[data-hero-pin] img"));
+      await Promise.allSettled(criticalImages.map((image) => image.decode?.()));
       if (cancelled) return;
+
       const gsap = gsapModule.gsap;
       const ScrollTrigger = scrollModule.ScrollTrigger;
-      const Lenis = lenisModule.default;
       gsap.registerPlugin(ScrollTrigger);
+      const markers = new URLSearchParams(window.location.search).has("debug-motion");
 
-      const lenis = new Lenis({ duration: 1.05, smoothWheel: true, wheelMultiplier: 0.85 });
-      const onScroll = () => ScrollTrigger.update();
-      lenis.on("scroll", onScroll);
-      const tick = (time: number) => lenis.raf(time * 1000);
-      gsap.ticker.add(tick);
-      gsap.ticker.lagSmoothing(0);
+      const contexts: Array<{ revert(): void }> = [];
+      const mediaQueries: Array<{ revert(): void }> = [];
 
-      const ctx = gsap.context(() => {
-        gsap.from("[data-hero-line]", { yPercent: 115, duration: 1.15, stagger: 0.1, ease: "power4.out", delay: 0.12 });
-        gsap.from("[data-hero-meta]", { opacity: 0, y: 20, duration: 0.75, stagger: 0.08, delay: 0.45 });
-        gsap.from("[data-hero-visual]", { opacity: 0, scale: 0.88, rotate: 3, duration: 1.4, ease: "power3.out", delay: 0.25 });
+      const hero = document.querySelector<HTMLElement>("[data-motion-hero]");
+      const heroPin = hero?.querySelector<HTMLElement>("[data-hero-pin]");
+      const heroContent = hero?.querySelector<HTMLElement>("[data-hero-content]");
+      const laptop = hero?.querySelector<HTMLElement>("[data-laptop-wrapper]");
+      const screen = hero?.querySelector<HTMLElement>("[data-laptop-screen]");
+      const frame = hero?.querySelector<HTMLElement>("[data-laptop-frame]");
+      const base = hero?.querySelector<HTMLElement>("[data-laptop-base]");
+      const takeover = hero?.querySelector<HTMLElement>("[data-takeover-content]");
 
-        gsap.utils.toArray<HTMLElement>("[data-reveal]").forEach((element) => {
-          gsap.from(element, { opacity: 0, y: 42, duration: 0.9, ease: "power3.out", scrollTrigger: { trigger: element, start: "top 86%", once: true } });
-        });
+      if (hero && heroPin && heroContent && laptop && screen && frame && base && takeover) {
+        const media = gsap.matchMedia();
+        mediaQueries.push(media);
+        {
+          const createTimeline = (distance: string, scrub: number) => {
+            const screenRect = screen.getBoundingClientRect();
+            const targetScale = Math.max(window.innerWidth / screenRect.width, window.innerHeight / screenRect.height) * 1.06;
+            const targetX = window.innerWidth / 2 - (screenRect.left + screenRect.width / 2);
+            const targetY = window.innerHeight / 2 - (screenRect.top + screenRect.height / 2);
 
-        gsap.utils.toArray<HTMLElement>("[data-parallax]").forEach((element) => {
-          gsap.to(element, { yPercent: -12, ease: "none", scrollTrigger: { trigger: element, start: "top bottom", end: "bottom top", scrub: 1 } });
-        });
+            gsap.set(takeover, { clipPath: "inset(100% 0 0 0)" });
+            const timeline = gsap.timeline({
+              defaults: { ease: "none" },
+              scrollTrigger: {
+                trigger: heroPin,
+                start: "top top",
+                end: distance,
+                pin: true,
+                scrub,
+                anticipatePin: 1,
+                invalidateOnRefresh: false,
+                markers,
+              },
+            });
 
-        const processLine = document.querySelector<HTMLElement>("[data-process-line]");
-        if (processLine) gsap.fromTo(processLine, { scaleY: 0 }, { scaleY: 1, ease: "none", scrollTrigger: { trigger: "#processo", start: "top 65%", end: "bottom 70%", scrub: 1 } });
-      });
+            timeline
+              .to({}, { duration: 0.25 })
+              .to(heroContent, { xPercent: -10, clipPath: "inset(0 100% 0 0)", duration: 0.3, ease: "power2.inOut" }, 0.25)
+              .to(laptop, { x: targetX, y: targetY, scale: targetScale, duration: 0.4, ease: "power2.inOut" }, 0.25)
+              .to(frame, { opacity: 0, duration: 0.2, ease: "power2.out" }, 0.65)
+              .to(base, { opacity: 0, yPercent: 80, duration: 0.2, ease: "power2.in" }, 0.65)
+              .to(screen, { borderRadius: 0, duration: 0.2, ease: "power2.out" }, 0.65)
+              .to(takeover, { clipPath: "inset(0 0 0 0)", duration: 0.15, ease: "power3.out" }, 0.85);
+          };
+
+          media.add("(min-width: 1200px)", () => createTimeline("+=160%", 0.9));
+          media.add("(min-width: 769px) and (max-width: 1199px)", () => createTimeline("+=90%", 0.75));
+          media.add("(max-width: 768px)", () => {
+            gsap.set([heroContent, laptop, screen, frame, base, takeover], { clearProps: "all" });
+          });
+        }
+      }
+
+      const projectsSection = document.querySelector<HTMLElement>(".projects-section");
+      const projectsStage = projectsSection?.querySelector<HTMLElement>("[data-projects-stage]");
+      const cards = projectsStage ? Array.from(projectsStage.querySelectorAll<HTMLElement>(".project-row")) : [];
+
+      if (projectsSection && projectsStage && cards.length > 1) {
+        const media = gsap.matchMedia();
+        mediaQueries.push(media);
+        {
+          media.add("(min-width: 769px)", () => {
+            gsap.set(cards, { position: "absolute", inset: 0, transformOrigin: "center top" });
+            gsap.set(cards[0], { zIndex: 30, scale: 1, y: 0, opacity: 1 });
+            cards.slice(1).forEach((card, index) => {
+              gsap.set(card, { zIndex: 20 - index * 10, scale: 0.96 - index * 0.04, y: 40 + index * 40, opacity: 0.75 - index * 0.3 });
+            });
+
+            const timeline = gsap.timeline({
+              defaults: { ease: "none" },
+              scrollTrigger: {
+                trigger: projectsStage,
+                start: "top 10%",
+                end: "+=90%",
+                pin: true,
+                scrub: 0.8,
+                anticipatePin: 1,
+                invalidateOnRefresh: true,
+                refreshPriority: -10,
+                markers,
+              },
+            });
+            timeline
+              .to({}, { duration: 0.12 })
+              .to(cards[0], { y: -48, scale: 0.93, opacity: 0.45, duration: 0.72, ease: "power2.inOut" }, 0.12)
+              .to(cards[1], { y: 0, scale: 1, opacity: 1, duration: 0.72, ease: "power2.inOut" }, 0.12)
+              .set(cards[0], { zIndex: 10 }, 0.5)
+              .set(cards[1], { zIndex: 30 }, 0.5);
+          });
+          media.add("(max-width: 768px)", () => gsap.set(cards, { clearProps: "all" }));
+        }
+      }
+
+      const processSection = document.querySelector<HTMLElement>(".process-section");
+      const processList = processSection?.querySelector<HTMLElement>(".process-list");
+      const processLine = processSection?.querySelector<HTMLElement>("[data-process-line]");
+      const processSteps = processSection ? Array.from(processSection.querySelectorAll<HTMLElement>("[data-process-step]")) : [];
+
+      if (processSection && processList && processLine && processSteps.length) {
+        const context = gsap.context(() => {
+          gsap.set(processLine, { scaleY: 0, transformOrigin: "top center" });
+
+          const setActiveStep = (progress: number) => {
+            const activeIndex = Math.min(processSteps.length - 1, Math.floor(progress * processSteps.length));
+            processSteps.forEach((step, index) => step.classList.toggle("is-active", index === activeIndex));
+          };
+
+          gsap.to(processLine, {
+            scaleY: 1,
+            ease: "none",
+            scrollTrigger: {
+              trigger: processList,
+              start: "top 68%",
+              end: "bottom 58%",
+              scrub: 0.55,
+              invalidateOnRefresh: true,
+              refreshPriority: -20,
+              markers,
+              onUpdate: (self) => setActiveStep(self.progress),
+              onRefresh: (self) => setActiveStep(self.progress),
+            },
+          });
+        }, processSection);
+        contexts.push(context);
+      }
 
       const header = document.querySelector<HTMLElement>("[data-header]");
-      const headerHandler = () => header?.classList.toggle("is-scrolled", window.scrollY > 28);
-      window.addEventListener("scroll", headerHandler, { passive: true });
-      headerHandler();
+      const updateHeader = () => header?.classList.toggle("is-scrolled", window.scrollY > 28);
+      const refresh = () => ScrollTrigger.refresh(true);
+      window.addEventListener("scroll", updateHeader, { passive: true });
+      window.addEventListener("load", refresh, { once: true });
+      updateHeader();
+      requestAnimationFrame(refresh);
+      document.documentElement.dataset.motionReady = "true";
 
-      const magnetic = Array.from(document.querySelectorAll<HTMLElement>("[data-magnetic]"));
-      const moveHandlers = magnetic.map((button) => {
-        const move = (event: MouseEvent) => {
-          const rect = button.getBoundingClientRect();
-          gsap.to(button, { x: (event.clientX - rect.left - rect.width / 2) * 0.12, y: (event.clientY - rect.top - rect.height / 2) * 0.12, duration: 0.3 });
-        };
-        const leave = () => gsap.to(button, { x: 0, y: 0, duration: 0.55, ease: "elastic.out(1, .45)" });
-        button.addEventListener("mousemove", move);
-        button.addEventListener("mouseleave", leave);
-        return { button, move, leave };
-      });
-
-      cleanup = () => {
-        moveHandlers.forEach(({ button, move, leave }) => { button.removeEventListener("mousemove", move); button.removeEventListener("mouseleave", leave); });
-        window.removeEventListener("scroll", headerHandler);
-        ctx.revert();
-        lenis.off("scroll", onScroll);
-        lenis.destroy();
-        gsap.ticker.remove(tick);
+      dispose = () => {
+        delete document.documentElement.dataset.motionReady;
+        window.removeEventListener("scroll", updateHeader);
+        window.removeEventListener("load", refresh);
+        mediaQueries.forEach((media) => media.revert());
+        contexts.forEach((context) => context.revert());
       };
-    });
+    };
 
-    return () => { cancelled = true; cleanup(); };
+    void initialize();
+    return () => { cancelled = true; dispose(); };
   }, []);
 
   return null;

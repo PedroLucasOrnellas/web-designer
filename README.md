@@ -24,9 +24,8 @@ Os mockups atuais são componentes CSS leves em `components/ui/ProjectVisual.tsx
 
 As páginas estão disponíveis em:
 
-- `/projetos/o-catalogo`
-- `/projetos/acougue-arpoador`
-- `/projetos/fipe-ipca`
+- `/projetos/the-human-dataset`
+- `/projetos/julie-doceria`
 
 Inclua URLs externas reais apenas quando os projetos estiverem publicados.
 

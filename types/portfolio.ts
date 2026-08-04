@@ -9,6 +9,13 @@ export type Project = {
   technologies: string[];
   accent: string;
   className: string;
+  image: string;
+  imageAlt: string;
+  status: string;
+  caseNote: string;
+  liveUrl?: string;
+  liveUrlExternal?: boolean;
+  liveUrlLabel?: string;
 };
 
 export type Service = {
