@@ -108,9 +108,9 @@ export function MotionEngine() {
             };
 
             gsap.set(cards, { position: "absolute", inset: 0, transformOrigin: "center center" });
-            gsap.set(cards[0], { zIndex: 30, y: 0, opacity: 1 });
-            gsap.set(cards[1], { zIndex: 20, y: 44, opacity: 1 });
-            gsap.set(cards[2], { zIndex: 10, y: 88, opacity: 0.9 });
+            gsap.set(cards[0], { zIndex: 10, yPercent: 0, y: 0, opacity: 1 });
+            gsap.set(cards[1], { zIndex: 20, yPercent: 100, y: -56, opacity: 1 });
+            gsap.set(cards[2], { zIndex: 30, yPercent: 100, y: -28, opacity: 1 });
             gsap.set(cards[0].querySelector("[data-project-copy]"), { opacity: 1, y: 0 });
             gsap.set(cards.slice(1).map((card) => card.querySelector("[data-project-copy]")), { opacity: 0.35, y: 12 });
             gsap.set(titles[0], { yPercent: 0 });
@@ -139,26 +139,17 @@ export function MotionEngine() {
             timeline
               .addLabel("projectOne", 0)
               .to({}, { duration: 0.16 })
-              .to(cards[0], { y: -96, opacity: 0, duration: 0.24, ease: "power2.inOut" }, 0.16)
-              .to(cards[1], { y: 0, opacity: 1, duration: 0.24, ease: "power2.inOut" }, 0.16)
-              .to(cards[2], { y: 44, opacity: 1, duration: 0.22, ease: "power2.inOut" }, 0.18)
-              .to(cards[0].querySelector("[data-project-copy]"), { opacity: 0, y: -10, duration: 0.16, ease: "power1.inOut" }, 0.16)
+              .to(cards[1], { yPercent: 0, y: 0, duration: 0.28, ease: "power2.inOut" }, 0.16)
+              .to(cards[2], { yPercent: 100, y: -56, duration: 0.22, ease: "power2.inOut" }, 0.18)
               .to(cards[1].querySelector("[data-project-copy]"), { opacity: 1, y: 0, duration: 0.16, ease: "power1.inOut" }, 0.29)
               .to(titles[1], { yPercent: 0, duration: 0.16, ease: "power2.out" }, 0.3)
               .to(descriptions[1], { opacity: 1, y: 0, duration: 0.14, ease: "power1.out" }, 0.34)
-              .set(cards[0], { zIndex: 5 }, 0.25)
-              .set(cards[1], { zIndex: 30 }, 0.25)
-              .set(cards[2], { zIndex: 20 }, 0.25)
               .addLabel("projectTwo", 0.5)
               .to({}, { duration: 0.12 })
-              .to(cards[1], { y: -96, opacity: 0, duration: 0.24, ease: "power2.inOut" }, 0.6)
-              .to(cards[2], { y: 0, opacity: 1, duration: 0.24, ease: "power2.inOut" }, 0.6)
-              .to(cards[1].querySelector("[data-project-copy]"), { opacity: 0, y: -10, duration: 0.16, ease: "power1.inOut" }, 0.6)
+              .to(cards[2], { yPercent: 0, y: 0, duration: 0.28, ease: "power2.inOut" }, 0.6)
               .to(cards[2].querySelector("[data-project-copy]"), { opacity: 1, y: 0, duration: 0.16, ease: "power1.inOut" }, 0.73)
               .to(titles[2], { yPercent: 0, duration: 0.16, ease: "power2.out" }, 0.74)
               .to(descriptions[2], { opacity: 1, y: 0, duration: 0.14, ease: "power1.out" }, 0.78)
-              .set(cards[1], { zIndex: 10 }, 0.69)
-              .set(cards[2], { zIndex: 30 }, 0.69)
               .addLabel("projectThree", 1);
 
             visuals.forEach((visual, index) => {
