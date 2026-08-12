@@ -86,44 +86,128 @@ export function MotionEngine() {
         }
       }
 
-      const projectsSection = document.querySelector<HTMLElement>(".projects-section");
+      const projectsSection = document.querySelector<HTMLElement>("[data-projects-showcase]");
       const projectsStage = projectsSection?.querySelector<HTMLElement>("[data-projects-stage]");
-      const cards = projectsStage ? Array.from(projectsStage.querySelectorAll<HTMLElement>(".project-row")) : [];
+      const cards = projectsStage ? Array.from(projectsStage.querySelectorAll<HTMLElement>("[data-project-card]")) : [];
 
       if (projectsSection && projectsStage && cards.length > 1) {
-        const media = gsap.matchMedia();
-        mediaQueries.push(media);
-        {
-          media.add("(min-width: 769px)", () => {
+        const context = gsap.context(() => {
+          const media = gsap.matchMedia();
+          media.add("(min-width: 768px)", () => {
+            const current = projectsSection.querySelector<HTMLElement>("[data-projects-current]");
+            const progress = Array.from(projectsSection.querySelectorAll<HTMLElement>("[data-project-progress]"));
+            const visuals = cards.map((card) => card.querySelector<HTMLElement>("[data-project-visual-inner]"));
+            const titles = cards.map((card) => card.querySelector<HTMLElement>(".showcase-title-mask h2"));
+            const descriptions = cards.map((card) => card.querySelector<HTMLElement>(".showcase-card-copy > p"));
+            const cleanups: Array<() => void> = [];
+
+            const setActive = (index: number) => {
+              cards.forEach((card, cardIndex) => card.classList.toggle("is-active", cardIndex === index));
+              progress.forEach((item, itemIndex) => item.classList.toggle("is-active", itemIndex === index));
+              if (current) current.textContent = String(index + 1).padStart(2, "0");
+            };
+
             gsap.set(cards, { position: "absolute", inset: 0, transformOrigin: "center top" });
             gsap.set(cards[0], { zIndex: 30, scale: 1, y: 0, opacity: 1 });
-            cards.slice(1).forEach((card, index) => {
-              gsap.set(card, { zIndex: 20 - index * 10, scale: 0.96 - index * 0.04, y: 40 + index * 40, opacity: 0.75 - index * 0.3 });
-            });
+            gsap.set(cards[1], { zIndex: 20, scale: 0.965, y: 36, opacity: 0.7 });
+            gsap.set(cards[2], { zIndex: 10, scale: 0.93, y: 72, opacity: 0.35 });
+            gsap.set(cards[0].querySelector("[data-project-copy]"), { opacity: 1, y: 0 });
+            gsap.set(cards.slice(1).map((card) => card.querySelector("[data-project-copy]")), { opacity: 0.35, y: 12 });
+            gsap.set(titles[0], { yPercent: 0 });
+            gsap.set(titles.slice(1), { yPercent: 108 });
+            gsap.set(descriptions[0], { opacity: 1, y: 0 });
+            gsap.set(descriptions.slice(1), { opacity: 0, y: 8 });
+            setActive(0);
 
             const timeline = gsap.timeline({
               defaults: { ease: "none" },
               scrollTrigger: {
                 trigger: projectsStage,
-                start: "top 10%",
-                end: "+=90%",
+                start: "top 8%",
+                end: () => `+=${window.innerHeight * 2}`,
                 pin: true,
-                scrub: 0.8,
+                scrub: 1,
                 anticipatePin: 1,
                 invalidateOnRefresh: true,
                 refreshPriority: -10,
                 markers,
+                onUpdate: (self) => setActive(self.progress < 0.24 ? 0 : self.progress < 0.74 ? 1 : 2),
+                onRefresh: (self) => setActive(self.progress < 0.24 ? 0 : self.progress < 0.74 ? 1 : 2),
               },
             });
+
             timeline
+              .addLabel("projectOne", 0)
+              .to({}, { duration: 0.16 })
+              .to(cards[0], { y: -70, scale: 0.94, opacity: 0.16, duration: 0.24, ease: "power2.inOut" }, 0.16)
+              .to(cards[1], { y: 0, scale: 1, opacity: 1, duration: 0.24, ease: "power2.inOut" }, 0.16)
+              .to(cards[2], { y: 36, scale: 0.965, opacity: 0.7, duration: 0.22, ease: "power2.inOut" }, 0.18)
+              .to(cards[0].querySelector("[data-project-copy]"), { opacity: 0, y: -10, duration: 0.16, ease: "power1.inOut" }, 0.16)
+              .to(cards[1].querySelector("[data-project-copy]"), { opacity: 1, y: 0, duration: 0.16, ease: "power1.inOut" }, 0.29)
+              .to(titles[1], { yPercent: 0, duration: 0.16, ease: "power2.out" }, 0.3)
+              .to(descriptions[1], { opacity: 1, y: 0, duration: 0.14, ease: "power1.out" }, 0.34)
+              .set(cards[0], { zIndex: 5 }, 0.25)
+              .set(cards[1], { zIndex: 30 }, 0.25)
+              .set(cards[2], { zIndex: 20 }, 0.25)
+              .addLabel("projectTwo", 0.5)
               .to({}, { duration: 0.12 })
-              .to(cards[0], { y: -48, scale: 0.93, opacity: 0.45, duration: 0.72, ease: "power2.inOut" }, 0.12)
-              .to(cards[1], { y: 0, scale: 1, opacity: 1, duration: 0.72, ease: "power2.inOut" }, 0.12)
-              .set(cards[0], { zIndex: 10 }, 0.5)
-              .set(cards[1], { zIndex: 30 }, 0.5);
+              .to(cards[1], { y: -70, scale: 0.94, opacity: 0.16, duration: 0.24, ease: "power2.inOut" }, 0.6)
+              .to(cards[2], { y: 0, scale: 1, opacity: 1, duration: 0.24, ease: "power2.inOut" }, 0.6)
+              .to(cards[1].querySelector("[data-project-copy]"), { opacity: 0, y: -10, duration: 0.16, ease: "power1.inOut" }, 0.6)
+              .to(cards[2].querySelector("[data-project-copy]"), { opacity: 1, y: 0, duration: 0.16, ease: "power1.inOut" }, 0.73)
+              .to(titles[2], { yPercent: 0, duration: 0.16, ease: "power2.out" }, 0.74)
+              .to(descriptions[2], { opacity: 1, y: 0, duration: 0.14, ease: "power1.out" }, 0.78)
+              .set(cards[1], { zIndex: 10 }, 0.69)
+              .set(cards[2], { zIndex: 30 }, 0.69)
+              .addLabel("projectThree", 1);
+
+            visuals.forEach((visual, index) => {
+              if (!visual) return;
+              const card = cards[index];
+              const move = (event: PointerEvent) => {
+                if (!card.classList.contains("is-active")) return;
+                const bounds = card.getBoundingClientRect();
+                gsap.to(visual, {
+                  x: ((event.clientX - bounds.left) / bounds.width - 0.5) * 8,
+                  y: ((event.clientY - bounds.top) / bounds.height - 0.5) * 6,
+                  duration: 0.55,
+                  ease: "power2.out",
+                  overwrite: "auto",
+                });
+              };
+              const reset = () => gsap.to(visual, { x: 0, y: 0, duration: 0.55, ease: "power2.out" });
+              card.addEventListener("pointermove", move);
+              card.addEventListener("pointerleave", reset);
+              cleanups.push(() => {
+                card.removeEventListener("pointermove", move);
+                card.removeEventListener("pointerleave", reset);
+              });
+            });
+
+            return () => cleanups.forEach((cleanup) => cleanup());
           });
-          media.add("(max-width: 768px)", () => gsap.set(cards, { clearProps: "all" }));
-        }
+
+          media.add("(max-width: 767px)", () => {
+            gsap.set(cards, { clearProps: "all" });
+            gsap.set(cards.map((card) => card.querySelector("[data-project-copy]")), { clearProps: "all" });
+            gsap.set(cards.map((card) => card.querySelector(".showcase-title-mask h2")), { clearProps: "all" });
+            gsap.set(cards.map((card) => card.querySelector(".showcase-card-copy > p")), { clearProps: "all" });
+            const mobileTimeline = gsap.timeline({
+              scrollTrigger: {
+                trigger: projectsSection,
+                start: "top 78%",
+                end: "bottom 72%",
+                scrub: 0.7,
+                invalidateOnRefresh: true,
+                markers,
+              },
+            });
+            cards.forEach((card, index) => {
+              mobileTimeline.from(card, { y: 42, opacity: 0, duration: 0.26, ease: "power2.out" }, index * 0.34);
+            });
+          });
+        }, projectsSection);
+        contexts.push(context);
       }
 
       const processSection = document.querySelector<HTMLElement>(".process-section");

@@ -4,8 +4,47 @@ import { ProjectVisual } from "@/components/ui/ProjectVisual";
 import { ArrowIcon } from "@/components/ui/ArrowIcon";
 
 export function ProjectsShowcase() {
-  return <section className="projects-section" id="projetos">
-    <div className="projects-heading"><p className="section-kicker"><span /> PROJETOS SELECIONADOS</p><h2>Trabalhos que<br />geram <em>impacto.</em></h2><p>Uma seleção de interfaces que equilibram clareza, presença visual e intenção de negócio.</p></div>
-    <div className="projects-stage" data-projects-stage><div className="projects-stack">{projects.map((project) => <article className="project-row" key={project.slug} style={{ "--project-accent": project.accent } as React.CSSProperties}><div className="project-index">{project.index}<span>/ 02</span></div><div className="project-copy"><p>{project.eyebrow}</p><h3>{project.name}</h3><span>{project.description}</span><div className="tag-list">{project.technologies.map((tech) => <small key={tech}>{tech}</small>)}</div><div className="project-actions"><Link href={`/projetos/${project.slug}`} className="text-link">Ver case <ArrowIcon diagonal /></Link>{project.liveUrl && (project.liveUrlExternal ? <a href={project.liveUrl} target="_blank" rel="noreferrer" className="text-link text-link-site">{project.liveUrlLabel ?? "Visitar site"} <ArrowIcon diagonal /></a> : <Link href={project.liveUrl} className="text-link text-link-site">{project.liveUrlLabel ?? "Visitar site"} <ArrowIcon diagonal /></Link>)}</div></div><Link href={`/projetos/${project.slug}`} className="project-visual-link" aria-label={`Ver case ${project.name}`}><ProjectVisual project={project} /></Link></article>)}</div></div>
-  </section>;
+  return (
+    <section className="projects-showcase" id="projetos" data-projects-showcase>
+      <header className="projects-showcase-header">
+        <p><span /> TRABALHOS SELECIONADOS</p>
+        <div className="projects-showcase-count" aria-live="polite">
+          <strong data-projects-current>01</strong><span> / 03</span>
+        </div>
+      </header>
+
+      <div className="projects-showcase-stage" data-projects-stage>
+        <div className="projects-showcase-stack">
+          {projects.map((project, index) => (
+            <article
+              className={`showcase-card${index === 0 ? " is-active" : ""}`}
+              key={project.slug}
+              data-project-card
+              style={{ "--project-accent": project.accent } as React.CSSProperties}
+            >
+              <div className="showcase-card-copy" data-project-copy>
+                <span className="showcase-card-number">{project.index}</span>
+                <div className="showcase-title-mask"><h2>{project.name}</h2></div>
+                <p>{project.description}</p>
+                <div className="showcase-tags">
+                  {project.technologies.map((technology) => <span key={technology}>{technology}</span>)}
+                </div>
+                <Link href={`/projetos/${project.slug}`} className="showcase-cta" data-project-cta>
+                  Ver case <ArrowIcon diagonal />
+                </Link>
+              </div>
+
+              <Link href={`/projetos/${project.slug}`} className="showcase-visual-link" aria-label={`Ver case ${project.name}`}>
+                <ProjectVisual project={project} />
+              </Link>
+            </article>
+          ))}
+        </div>
+
+        <div className="projects-progress" aria-hidden="true">
+          {projects.map((project, index) => <i key={project.slug} className={index === 0 ? "is-active" : undefined} data-project-progress />)}
+        </div>
+      </div>
+    </section>
+  );
 }
