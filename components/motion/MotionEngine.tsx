@@ -107,10 +107,10 @@ export function MotionEngine() {
               if (current) current.textContent = String(index + 1).padStart(2, "0");
             };
 
-            gsap.set(cards, { position: "absolute", inset: 0, transformOrigin: "center top" });
-            gsap.set(cards[0], { zIndex: 30, scale: 1, y: 0, opacity: 1 });
-            gsap.set(cards[1], { zIndex: 20, scale: 0.965, y: 36, opacity: 0.7 });
-            gsap.set(cards[2], { zIndex: 10, scale: 0.93, y: 72, opacity: 0.35 });
+            gsap.set(cards, { position: "absolute", inset: 0, transformOrigin: "center center" });
+            gsap.set(cards[0], { zIndex: 30, yPercent: 0, opacity: 1 });
+            gsap.set(cards[1], { zIndex: 20, yPercent: 88, opacity: 1 });
+            gsap.set(cards[2], { zIndex: 10, yPercent: 94, opacity: 0.9 });
             gsap.set(cards[0].querySelector("[data-project-copy]"), { opacity: 1, y: 0 });
             gsap.set(cards.slice(1).map((card) => card.querySelector("[data-project-copy]")), { opacity: 0.35, y: 12 });
             gsap.set(titles[0], { yPercent: 0 });
@@ -139,9 +139,9 @@ export function MotionEngine() {
             timeline
               .addLabel("projectOne", 0)
               .to({}, { duration: 0.16 })
-              .to(cards[0], { y: -70, scale: 0.94, opacity: 0.16, duration: 0.24, ease: "power2.inOut" }, 0.16)
-              .to(cards[1], { y: 0, scale: 1, opacity: 1, duration: 0.24, ease: "power2.inOut" }, 0.16)
-              .to(cards[2], { y: 36, scale: 0.965, opacity: 0.7, duration: 0.22, ease: "power2.inOut" }, 0.18)
+              .to(cards[0], { yPercent: -108, opacity: 0.2, duration: 0.24, ease: "power2.inOut" }, 0.16)
+              .to(cards[1], { yPercent: 0, opacity: 1, duration: 0.24, ease: "power2.inOut" }, 0.16)
+              .to(cards[2], { yPercent: 88, opacity: 1, duration: 0.22, ease: "power2.inOut" }, 0.18)
               .to(cards[0].querySelector("[data-project-copy]"), { opacity: 0, y: -10, duration: 0.16, ease: "power1.inOut" }, 0.16)
               .to(cards[1].querySelector("[data-project-copy]"), { opacity: 1, y: 0, duration: 0.16, ease: "power1.inOut" }, 0.29)
               .to(titles[1], { yPercent: 0, duration: 0.16, ease: "power2.out" }, 0.3)
@@ -151,8 +151,8 @@ export function MotionEngine() {
               .set(cards[2], { zIndex: 20 }, 0.25)
               .addLabel("projectTwo", 0.5)
               .to({}, { duration: 0.12 })
-              .to(cards[1], { y: -70, scale: 0.94, opacity: 0.16, duration: 0.24, ease: "power2.inOut" }, 0.6)
-              .to(cards[2], { y: 0, scale: 1, opacity: 1, duration: 0.24, ease: "power2.inOut" }, 0.6)
+              .to(cards[1], { yPercent: -108, opacity: 0.2, duration: 0.24, ease: "power2.inOut" }, 0.6)
+              .to(cards[2], { yPercent: 0, opacity: 1, duration: 0.24, ease: "power2.inOut" }, 0.6)
               .to(cards[1].querySelector("[data-project-copy]"), { opacity: 0, y: -10, duration: 0.16, ease: "power1.inOut" }, 0.6)
               .to(cards[2].querySelector("[data-project-copy]"), { opacity: 1, y: 0, duration: 0.16, ease: "power1.inOut" }, 0.73)
               .to(titles[2], { yPercent: 0, duration: 0.16, ease: "power2.out" }, 0.74)
