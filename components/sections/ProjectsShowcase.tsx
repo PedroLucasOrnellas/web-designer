@@ -1,69 +1,99 @@
+"use client";
+
+import { useState } from "react";
 import Link from "next/link";
 import { projects } from "@/data/portfolio";
 import { ProjectVisual } from "@/components/ui/ProjectVisual";
-import { ArrowIcon } from "@/components/ui/ArrowIcon";
 
 export function ProjectsShowcase() {
+  const [activeProject, setActiveProject] = useState<string | null>(null);
+
+  const toggleProject = (slug: string) => {
+    setActiveProject((current) => current === slug ? null : slug);
+  };
+
   return (
-    <section className="projects-showcase" id="projetos" data-projects-showcase>
-      <header className="projects-showcase-header">
-        <p><span /> TRABALHOS SELECIONADOS</p>
-        <div className="projects-showcase-count" aria-live="polite">
-          <strong data-projects-current>01</strong><span> / 03</span>
-        </div>
+    <section className="projects-accordion-section" id="projetos" data-projects-accordion>
+      <header className="projects-accordion-heading">
+        <p><span /> PROJETOS SELECIONADOS</p>
+        <h2>Trabalhos que combinam design,<br />tecnologia e estratégia.</h2>
       </header>
 
-      <div className="projects-showcase-stage" data-projects-stage>
-        <div className="projects-showcase-stack">
-          {projects.map((project, index) => (
+      <div className={`projects-accordion${activeProject ? " has-active" : ""}`}>
+        {projects.map((project) => {
+          const isActive = activeProject === project.slug;
+          const contentId = `project-panel-${project.slug}`;
+
+          return (
             <article
-              className={`showcase-card${index === 0 ? " is-active" : ""}`}
               key={project.slug}
-              data-project-card
+              className={`project-accordion-panel${isActive ? " is-active" : ""}`}
               style={{ "--project-accent": project.accent } as React.CSSProperties}
             >
-              <div className="showcase-card-copy" data-project-copy>
-                <span className="showcase-card-number">{project.index}</span>
-                <div className="showcase-title-mask"><h2>{project.name}</h2></div>
-                <p>{project.description}</p>
-                <div className="showcase-tags">
-                  {project.technologies.map((technology) => <span key={technology}>{technology}</span>)}
+              <button
+                type="button"
+                className="project-accordion-trigger"
+                aria-expanded={isActive}
+                aria-controls={contentId}
+                onClick={() => toggleProject(project.slug)}
+              >
+                <span className="project-accordion-index">{project.index}</span>
+                <span className="project-accordion-summary">
+                  <strong>{project.name}</strong>
+                  <small>{project.shortCategory}</small>
+                </span>
+                <span className="project-accordion-toggle" aria-hidden="true">{isActive ? "−" : "+"}</span>
+              </button>
+
+              <div
+                className="project-accordion-content"
+                id={contentId}
+                aria-hidden={!isActive}
+              >
+                <div className="project-accordion-copy">
+                  <div className="project-reveal project-reveal-title">
+                    <span>{project.index}</span>
+                    <h3>{project.name}</h3>
+                  </div>
+                  <p className="project-reveal project-reveal-description">{project.description}</p>
                 </div>
-                <div className="showcase-actions">
-                  <Link href={`/projetos/${project.slug}`} className="showcase-cta" data-project-cta>
-                    Ver case <ArrowIcon diagonal />
-                  </Link>
-                  {project.liveUrl && (project.liveUrlExternal ? (
-                    <a href={project.liveUrl} target="_blank" rel="noreferrer" className="showcase-live-link">
-                      {project.liveUrlLabel ?? "Abrir projeto"} <ArrowIcon diagonal />
-                    </a>
-                  ) : (
-                    <Link href={project.liveUrl} target="_blank" rel="noreferrer" className="showcase-live-link">
-                      {project.liveUrlLabel ?? "Abrir projeto"} <ArrowIcon diagonal />
+
+                <div className="project-reveal project-accordion-visual">
+                  <ProjectVisual project={project} />
+                </div>
+
+                <div className="project-accordion-details">
+                  <div className="project-reveal project-accordion-meta">
+                    <div>
+                      <small>CATEGORIAS</small>
+                      {project.categories.map((category) => <span key={category}>{category}</span>)}
+                    </div>
+                    <div>
+                      <small>TECNOLOGIAS</small>
+                      {project.technologies.map((technology) => <span key={technology}>{technology}</span>)}
+                    </div>
+                  </div>
+                  <div className="project-reveal project-accordion-actions">
+                    <Link href={`/projetos/${project.slug}`} className="project-case-cta" tabIndex={isActive ? 0 : -1}>
+                      Ver case <span aria-hidden="true">→</span>
                     </Link>
-                  ))}
+                    {project.liveUrl ? (
+                      project.liveUrlExternal ? (
+                        <a href={project.liveUrl} target="_blank" rel="noopener noreferrer" tabIndex={isActive ? 0 : -1}>
+                          Visitar site <span aria-hidden="true">↗</span>
+                        </a>
+                      ) : (
+                        <Link href={project.liveUrl} target="_blank" rel="noopener noreferrer" tabIndex={isActive ? 0 : -1}>
+                          Visitar site <span aria-hidden="true">↗</span>
+                        </Link>
+                      )
+                    ) : <span className="project-link-placeholder">Site em breve</span>}
+                  </div>
                 </div>
               </div>
-
-              <Link href={`/projetos/${project.slug}`} className="showcase-visual-link" aria-label={`Ver case ${project.name}`}>
-                <ProjectVisual project={project} />
-              </Link>
             </article>
-          ))}
-        </div>
-
-        <div className="projects-progress" aria-hidden="true">
-          {projects.map((project, index) => <i key={project.slug} className={index === 0 ? "is-active" : undefined} data-project-progress />)}
-        </div>
-      </div>
-
-      <div className="projects-cursor-previews" aria-hidden="true">
-        {projects.map((project) => (
-          <div className="project-cursor-preview" key={project.slug} data-project-cursor-preview>
-            <ProjectVisual project={project} compact />
-            <span>{project.index} — {project.name}</span>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </section>
   );

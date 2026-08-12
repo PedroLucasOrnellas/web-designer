@@ -3,6 +3,8 @@ export type Project = {
   index: string;
   name: string;
   eyebrow: string;
+  shortCategory: string;
+  categories: string[];
   description: string;
   challenge: string;
   solution: string;
