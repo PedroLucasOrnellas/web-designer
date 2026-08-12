@@ -123,10 +123,10 @@ export function MotionEngine() {
               defaults: { ease: "none" },
               scrollTrigger: {
                 trigger: projectsStage,
-                start: "top 8%",
-                end: () => `+=${window.innerHeight * 2}`,
+                start: () => `top ${window.innerHeight * 0.08 + 20}px`,
+                end: () => `+=${window.innerHeight * 2.5}`,
                 pin: true,
-                scrub: 1,
+                scrub: 1.15,
                 anticipatePin: 1,
                 invalidateOnRefresh: true,
                 refreshPriority: -10,
