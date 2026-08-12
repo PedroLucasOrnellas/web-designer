@@ -29,9 +29,20 @@ export function ProjectsShowcase() {
                 <div className="showcase-tags">
                   {project.technologies.map((technology) => <span key={technology}>{technology}</span>)}
                 </div>
-                <Link href={`/projetos/${project.slug}`} className="showcase-cta" data-project-cta>
-                  Ver case <ArrowIcon diagonal />
-                </Link>
+                <div className="showcase-actions">
+                  <Link href={`/projetos/${project.slug}`} className="showcase-cta" data-project-cta>
+                    Ver case <ArrowIcon diagonal />
+                  </Link>
+                  {project.liveUrl && (project.liveUrlExternal ? (
+                    <a href={project.liveUrl} target="_blank" rel="noreferrer" className="showcase-live-link">
+                      {project.liveUrlLabel ?? "Abrir projeto"} <ArrowIcon diagonal />
+                    </a>
+                  ) : (
+                    <Link href={project.liveUrl} target="_blank" rel="noreferrer" className="showcase-live-link">
+                      {project.liveUrlLabel ?? "Abrir projeto"} <ArrowIcon diagonal />
+                    </Link>
+                  ))}
+                </div>
               </div>
 
               <Link href={`/projetos/${project.slug}`} className="showcase-visual-link" aria-label={`Ver case ${project.name}`}>
@@ -44,6 +55,15 @@ export function ProjectsShowcase() {
         <div className="projects-progress" aria-hidden="true">
           {projects.map((project, index) => <i key={project.slug} className={index === 0 ? "is-active" : undefined} data-project-progress />)}
         </div>
+      </div>
+
+      <div className="projects-cursor-previews" aria-hidden="true">
+        {projects.map((project) => (
+          <div className="project-cursor-preview" key={project.slug} data-project-cursor-preview>
+            <ProjectVisual project={project} compact />
+            <span>{project.index} — {project.name}</span>
+          </div>
+        ))}
       </div>
     </section>
   );

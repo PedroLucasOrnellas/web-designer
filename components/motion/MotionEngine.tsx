@@ -96,6 +96,7 @@ export function MotionEngine() {
           media.add("(min-width: 768px)", () => {
             const current = projectsSection.querySelector<HTMLElement>("[data-projects-current]");
             const progress = Array.from(projectsSection.querySelectorAll<HTMLElement>("[data-project-progress]"));
+            const cursorPreviews = Array.from(projectsSection.querySelectorAll<HTMLElement>("[data-project-cursor-preview]"));
             const visuals = cards.map((card) => card.querySelector<HTMLElement>("[data-project-visual-inner]"));
             const titles = cards.map((card) => card.querySelector<HTMLElement>(".showcase-title-mask h2"));
             const descriptions = cards.map((card) => card.querySelector<HTMLElement>(".showcase-card-copy > p"));
@@ -117,6 +118,7 @@ export function MotionEngine() {
             gsap.set(titles.slice(1), { yPercent: 108 });
             gsap.set(descriptions[0], { opacity: 1, y: 0 });
             gsap.set(descriptions.slice(1), { opacity: 0, y: 8 });
+            gsap.set(cursorPreviews, { autoAlpha: 0, scale: 0.94 });
             setActive(0);
 
             const timeline = gsap.timeline({
@@ -155,7 +157,26 @@ export function MotionEngine() {
             visuals.forEach((visual, index) => {
               if (!visual) return;
               const card = cards[index];
+              const cursorPreview = cursorPreviews[index];
+              const positionPreview = (event: PointerEvent, immediate = false) => {
+                if (!cursorPreview) return;
+                const width = cursorPreview.offsetWidth;
+                const height = cursorPreview.offsetHeight;
+                const preferredX = event.clientX + 28;
+                const preferredY = event.clientY + 24;
+                const x = preferredX + width > window.innerWidth - 16 ? event.clientX - width - 28 : preferredX;
+                const y = preferredY + height > window.innerHeight - 16 ? event.clientY - height - 24 : preferredY;
+                const values = { x: Math.max(16, x), y: Math.max(16, y) };
+                if (immediate) gsap.set(cursorPreview, values);
+                else gsap.to(cursorPreview, { ...values, duration: 0.26, ease: "power3.out", overwrite: "auto" });
+              };
+              const showPreview = (event: PointerEvent) => {
+                if (!cursorPreview) return;
+                positionPreview(event, true);
+                gsap.to(cursorPreview, { autoAlpha: 1, scale: 1, duration: 0.22, ease: "power2.out", overwrite: "auto" });
+              };
               const move = (event: PointerEvent) => {
+                positionPreview(event);
                 if (!card.classList.contains("is-active")) return;
                 const bounds = card.getBoundingClientRect();
                 gsap.to(visual, {
@@ -166,10 +187,15 @@ export function MotionEngine() {
                   overwrite: "auto",
                 });
               };
-              const reset = () => gsap.to(visual, { x: 0, y: 0, duration: 0.55, ease: "power2.out" });
+              const reset = () => {
+                gsap.to(visual, { x: 0, y: 0, duration: 0.55, ease: "power2.out" });
+                if (cursorPreview) gsap.to(cursorPreview, { autoAlpha: 0, scale: 0.94, duration: 0.18, ease: "power2.in", overwrite: "auto" });
+              };
+              card.addEventListener("pointerenter", showPreview);
               card.addEventListener("pointermove", move);
               card.addEventListener("pointerleave", reset);
               cleanups.push(() => {
+                card.removeEventListener("pointerenter", showPreview);
                 card.removeEventListener("pointermove", move);
                 card.removeEventListener("pointerleave", reset);
               });
