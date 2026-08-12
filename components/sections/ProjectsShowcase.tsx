@@ -35,13 +35,10 @@ export function ProjectsShowcase() {
                 className="project-accordion-trigger"
                 aria-expanded={isActive}
                 aria-controls={contentId}
+                aria-label={`${isActive ? "Fechar" : "Abrir"} projeto ${project.name}`}
                 onClick={() => toggleProject(project.slug)}
               >
                 <span className="project-accordion-index">{project.index}</span>
-                <span className="project-accordion-summary">
-                  <strong>{project.name}</strong>
-                  <small>{project.shortCategory}</small>
-                </span>
                 <span className="project-accordion-toggle" aria-hidden="true">{isActive ? "−" : "+"}</span>
               </button>
 
@@ -50,20 +47,18 @@ export function ProjectsShowcase() {
                 id={contentId}
                 aria-hidden={!isActive}
               >
-                <div className="project-accordion-copy">
-                  <div className="project-reveal project-reveal-title">
-                    <span>{project.index}</span>
-                    <h3>{project.name}</h3>
-                  </div>
-                  <p className="project-reveal project-reveal-description">{project.description}</p>
-                </div>
-
-                <div className="project-reveal project-accordion-visual">
+                <div className="project-accordion-visual">
                   <ProjectVisual project={project} />
                 </div>
 
+                <div className="project-morph-title">
+                  <h3>{project.name}</h3>
+                  <small>{project.shortCategory}</small>
+                </div>
+
                 <div className="project-accordion-details">
-                  <div className="project-reveal project-accordion-meta">
+                  <p className="project-detail project-reveal-description">{project.description}</p>
+                  <div className="project-detail project-accordion-meta">
                     <div>
                       <small>CATEGORIAS</small>
                       {project.categories.map((category) => <span key={category}>{category}</span>)}
@@ -73,7 +68,7 @@ export function ProjectsShowcase() {
                       {project.technologies.map((technology) => <span key={technology}>{technology}</span>)}
                     </div>
                   </div>
-                  <div className="project-reveal project-accordion-actions">
+                  <div className="project-detail project-accordion-actions">
                     <Link href={`/projetos/${project.slug}`} className="project-case-cta" tabIndex={isActive ? 0 : -1}>
                       Ver case <span aria-hidden="true">→</span>
                     </Link>
