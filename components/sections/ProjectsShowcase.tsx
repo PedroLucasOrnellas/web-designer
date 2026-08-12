@@ -5,6 +5,24 @@ import Link from "next/link";
 import { projects } from "@/data/portfolio";
 import { ProjectVisual } from "@/components/ui/ProjectVisual";
 
+function LetterReveal({ text }: { text: string }) {
+  return (
+    <span className="letter-reveal" aria-label={text}>
+      <span aria-hidden="true">
+        {Array.from(text).map((character, index) => (
+          <span
+            className={`project-char${character === " " ? " is-space" : ""}`}
+            style={{ "--char-index": index } as React.CSSProperties}
+            key={`${character}-${index}`}
+          >
+            {character === " " ? "\u00a0" : character}
+          </span>
+        ))}
+      </span>
+    </span>
+  );
+}
+
 export function ProjectsShowcase() {
   const [activeProject, setActiveProject] = useState<string | null>(null);
 
@@ -57,29 +75,29 @@ export function ProjectsShowcase() {
                 </div>
 
                 <div className="project-accordion-details">
-                  <p className="project-detail project-reveal-description">{project.description}</p>
+                  <p className="project-detail project-reveal-description"><LetterReveal text={project.description} /></p>
                   <div className="project-detail project-accordion-meta">
                     <div>
-                      <small>CATEGORIAS</small>
-                      {project.categories.map((category) => <span key={category}>{category}</span>)}
+                      <small><LetterReveal text="CATEGORIAS" /></small>
+                      {project.categories.map((category) => <span key={category}><LetterReveal text={category} /></span>)}
                     </div>
                     <div>
-                      <small>TECNOLOGIAS</small>
-                      {project.technologies.map((technology) => <span key={technology}>{technology}</span>)}
+                      <small><LetterReveal text="TECNOLOGIAS" /></small>
+                      {project.technologies.map((technology) => <span key={technology}><LetterReveal text={technology} /></span>)}
                     </div>
                   </div>
                   <div className="project-detail project-accordion-actions">
-                    <Link href={`/projetos/${project.slug}`} className="project-case-cta" tabIndex={isActive ? 0 : -1}>
-                      Ver case <span aria-hidden="true">→</span>
+                    <Link href={`/projetos/${project.slug}`} className="project-case-cta" tabIndex={isActive ? 0 : -1} aria-label="Ver case">
+                      <LetterReveal text="Ver case" /> <span aria-hidden="true">→</span>
                     </Link>
                     {project.liveUrl ? (
                       project.liveUrlExternal ? (
-                        <a href={project.liveUrl} target="_blank" rel="noopener noreferrer" tabIndex={isActive ? 0 : -1}>
-                          Visitar site <span aria-hidden="true">↗</span>
+                        <a href={project.liveUrl} target="_blank" rel="noopener noreferrer" tabIndex={isActive ? 0 : -1} aria-label="Visitar site">
+                          <LetterReveal text="Visitar site" /> <span aria-hidden="true">↗</span>
                         </a>
                       ) : (
-                        <Link href={project.liveUrl} target="_blank" rel="noopener noreferrer" tabIndex={isActive ? 0 : -1}>
-                          Visitar site <span aria-hidden="true">↗</span>
+                        <Link href={project.liveUrl} target="_blank" rel="noopener noreferrer" tabIndex={isActive ? 0 : -1} aria-label="Visitar site">
+                          <LetterReveal text="Visitar site" /> <span aria-hidden="true">↗</span>
                         </Link>
                       )
                     ) : <span className="project-link-placeholder">Site em breve</span>}
