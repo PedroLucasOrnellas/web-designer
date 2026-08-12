@@ -6,16 +6,22 @@ import { projects } from "@/data/portfolio";
 import { ProjectVisual } from "@/components/ui/ProjectVisual";
 
 function LetterReveal({ text }: { text: string }) {
+  let characterIndex = 0;
+
   return (
     <span className="letter-reveal" aria-label={text}>
       <span aria-hidden="true">
-        {Array.from(text).map((character, index) => (
-          <span
-            className={`project-char${character === " " ? " is-space" : ""}`}
-            style={{ "--char-index": index } as React.CSSProperties}
-            key={`${character}-${index}`}
-          >
-            {character === " " ? "\u00a0" : character}
+        {text.split(" ").map((word, wordIndex, words) => (
+          <span className="project-word" key={`${word}-${wordIndex}`}>
+            {Array.from(word).map((character) => {
+              const index = characterIndex++;
+              return (
+                <span className="project-char" style={{ "--char-index": index } as React.CSSProperties} key={`${character}-${index}`}>
+                  {character}
+                </span>
+              );
+            })}
+            {wordIndex < words.length - 1 && <span className="project-space"> </span>}
           </span>
         ))}
       </span>
