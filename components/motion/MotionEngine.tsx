@@ -4,7 +4,45 @@ import { useLayoutEffect } from "react";
 
 export function MotionEngine() {
   useLayoutEffect(() => {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    const handleInternalNavigation = (event: MouseEvent) => {
+      const link = (event.target as HTMLElement | null)?.closest<HTMLAnchorElement>('a[href*="#"]');
+      if (!link || event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+
+      const url = new URL(link.href, window.location.href);
+      if (url.origin !== window.location.origin || url.pathname !== window.location.pathname || !url.hash) return;
+
+      const target = document.getElementById(decodeURIComponent(url.hash.slice(1)));
+      if (!target) return;
+
+      event.preventDefault();
+      target.scrollIntoView({ behavior: reducedMotion ? "auto" : "smooth", block: "start" });
+      // Move keyboard navigation to the destination, without a second scroll.
+      if (!target.hasAttribute("tabindex")) target.setAttribute("tabindex", "-1");
+      target.focus({ preventScroll: true });
+      window.history.pushState(null, "", `${url.pathname}${url.search}${url.hash}`);
+    };
+
+    document.addEventListener("click", handleInternalNavigation, true);
+    if (reducedMotion) return () => document.removeEventListener("click", handleInternalNavigation, true);
+
+    // A single, short mask reveal for section headings; content stays visible
+    // without JavaScript and no scroll pinning is needed for these sections.
+    const revealTargets = Array.from(document.querySelectorAll<HTMLElement>("main section h2"));
+    const revealObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        entry.target.querySelectorAll(".section-mask-reveal").forEach((heading) => heading.classList.add("is-revealed"));
+        revealObserver.unobserve(entry.target);
+      });
+    }, { threshold: 0 });
+    revealTargets.forEach((target) => {
+      target.classList.add("section-mask-reveal");
+      // Observe the unclipped wrapper: a fully clipped heading has no
+      // intersection area and could otherwise remain hidden indefinitely.
+      if (target.parentElement) revealObserver.observe(target.parentElement);
+    });
 
     let cancelled = false;
     let dispose = () => {};
@@ -138,7 +176,13 @@ export function MotionEngine() {
     };
 
     void initialize();
-    return () => { cancelled = true; dispose(); };
+    return () => {
+      cancelled = true;
+      revealObserver.disconnect();
+      revealTargets.forEach((target) => target.classList.remove("section-mask-reveal", "is-revealed"));
+      document.removeEventListener("click", handleInternalNavigation, true);
+      dispose();
+    };
   }, []);
 
   return null;

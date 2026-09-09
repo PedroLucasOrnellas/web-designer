@@ -39,8 +39,8 @@ export function ProjectsShowcase() {
   return (
     <section className="projects-accordion-section" id="projetos" data-projects-accordion>
       <header className="projects-accordion-heading">
-        <p><span /> PROJETOS SELECIONADOS</p>
-        <h2>Trabalhos que combinam design,<br />tecnologia e estratégia.</h2>
+        <p><span /> DA ESTRATÉGIA À INTERFACE</p>
+        <h2>Projetos que mostram<br />como eu resolvo.</h2>
       </header>
 
       <div className={`projects-accordion${activeProject ? " has-active" : ""}`}>
@@ -69,7 +69,6 @@ export function ProjectsShowcase() {
               <div
                 className="project-accordion-content"
                 id={contentId}
-                aria-hidden={!isActive}
               >
                 <div className="project-accordion-visual">
                   <ProjectVisual project={project} />

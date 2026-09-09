@@ -24,13 +24,24 @@ function FipeScene() {
   </div>;
 }
 
+function EpimoniScene() {
+  return <div className="scene-ui scene-epimoni">
+    <header><b>EPIMONI</b><span>Automóveis</span><span>Sobre nós</span><span>Contato</span><i /></header>
+    <div className="scene-epimoni-hero">
+      <div><small>EPIMONI VEÍCULOS · NOVA FRIBURGO, RJ</small><strong>Seu próximo carro.<br /><em>Um novo caminho.</em></strong><p>Veículos escolhidos para acompanhar o próximo capítulo.</p><button>Explorar automóveis ↗</button></div>
+      <div className="scene-car" aria-hidden="true"><i /><i /><i /><i /></div>
+    </div>
+    <div className="scene-inventory"><article><i /><span>Yamaha XTZ 250</span><b>2025</b></article><article><i /><span>Volkswagen Saveiro</span><b>2023</b></article><article><i /><span>Fiat Toro Ranch</span><b>2025</b></article></div>
+  </div>;
+}
+
 export function ProjectVisual({ project, compact = false }: { project: Project; compact?: boolean }) {
-  const scene = project.className === "visual-catalogo" ? <CatalogScene /> : project.className === "visual-arpoador" ? <ArpoadorScene /> : project.className === "visual-fipe" ? <FipeScene /> : null;
+  const scene = project.image ? null : project.className === "visual-catalogo" ? <CatalogScene /> : project.className === "visual-arpoador" ? <ArpoadorScene /> : project.className === "visual-fipe" ? <FipeScene /> : project.className === "visual-epimoni" ? <EpimoniScene /> : null;
 
   return (
-    <div className={`project-visual ${project.className} ${compact ? "project-visual-compact" : ""}`} aria-label={`Prévia visual do projeto ${project.name}`} role="img" data-project-visual>
+    <div className={`project-visual ${project.className} ${project.image ? "project-visual-screenshot" : ""} ${compact ? "project-visual-compact" : ""}`} aria-label={`Prévia visual do projeto ${project.name}`} role="img" data-project-visual>
       <div className="visual-grid" />
-      <div className="browser-shell" data-project-visual-inner>
+      <div className="browser-shell" data-project-visual-inner inert>
         <div className="browser-bar"><i /><i /><i /><span>{project.slug}</span></div>
         <div className="project-image-frame">
           {scene ?? (project.image && <Image src={project.image} alt={project.imageAlt ?? project.name} fill sizes={compact ? "86vw" : "(max-width: 900px) 90vw, 52vw"} className="project-image" priority={project.index === "01"} />)}

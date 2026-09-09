@@ -14,23 +14,35 @@ async function render(pathname = "/") {
   );
 }
 
-test("server-renders the stabilized portfolio structure", async () => {
+test("server-renders the progressive portfolio and preserves project destinations", async () => {
   const response = await render();
   assert.equal(response.status, 200);
   assert.match(response.headers.get("content-type") ?? "", /^text\/html\b/i);
 
   const html = await response.text();
   assert.match(html, /<title>Pedro Lucas/);
-  assert.match(html, /data-motion-hero/);
-  assert.match(html, /class="hero-pin"/);
-  assert.match(html, /class="hero-title"/);
-  assert.match(html, /class="laptop-wrapper"/);
-  assert.match(html, /data-laptop-screen/);
-  assert.match(html, /data-takeover-content/);
-  assert.match(html, /class="projects-stage"/);
-  assert.match(html, /data-projects-stage/);
-  assert.match(html, /href="https:\/\/pedrolucasornellas\.github\.io\//);
-  assert.match(html, /href="\/lp-bolo\/index\.html"/);
+  assert.match(html, /data-progressive-home/);
+  assert.match(html, /data-service-accordion/);
+  assert.match(html, /data-project-carousel/);
+  assert.match(html, /data-process-tabs/);
+  assert.match(html, /data-faq-accordion/);
+  const sectionIds = ["topo", "servicos", "projetos", "processo", "sobre", "faq", "contato"];
+  let previous = -1;
+  for (const id of sectionIds) {
+    const position = html.indexOf('id="' + id + '"');
+    assert.ok(position > previous, id + " must follow the previous section");
+    previous = position;
+  }
+  assert.equal((html.match(/<summary/g) ?? []).length, 0);
+  assert.match(html, /aria-expanded="true"/);
+  assert.match(html, /Solicitar um projeto/);
+  assert.match(html, /Antes da interface, clareza/);
+  assert.match(html, /Um projeto de cada vez/);
+  assert.doesNotMatch(html, /CONTATO PENDENTE|SUBSTITUA|SUBSTITUIR LINKS/);
+  for (const slug of ["o-catalogo", "julie-doceria", "the-human-dataset", "epimoni-veiculos"]) {
+    assert.ok(html.includes('href="/projetos/' + slug + '"'));
+  }
+  assert.match(html, /Epimoni Veículos/);
   assert.doesNotMatch(html, /data-preloader|data-scramble|data-case-transition/);
 });
 
@@ -66,6 +78,8 @@ test("server-renders project cases without transition overlays", async () => {
   const html = await response.text();
   assert.match(html, /The Human Dataset/);
   assert.match(html, /class="case-project-visual"/);
+  assert.match(html, /DECISÕES DE DESIGN E DESENVOLVIMENTO/);
+  assert.match(html, /IMPACTO QUALITATIVO/);
   assert.match(html, /class="next-case"/);
   assert.doesNotMatch(html, /data-case-mask|data-case-transition/);
 });

@@ -1,21 +1,11 @@
 import type { Metadata } from "next";
-import { Header } from "@/components/layout/Header";
-import { Footer } from "@/components/layout/Footer";
-import { MotionEngine } from "@/components/motion/MotionEngine";
-import { HeroConcept } from "@/components/hero-concept/HeroConcept";
-import { TechStrip } from "@/components/sections/TechStrip";
-import { ProjectsShowcase } from "@/components/sections/ProjectsShowcase";
-import { Manifesto } from "@/components/sections/Manifesto";
-import { Services } from "@/components/sections/Services";
-import { Process } from "@/components/sections/Process";
-import { About } from "@/components/sections/About";
-import { FinalCTA } from "@/components/sections/FinalCTA";
+import { ProgressiveHome } from "@/components/experience/ProgressiveHome";
 
 export const metadata: Metadata = {
-  title: "Pedro Lucas — Web Designer & Frontend Developer",
+  title: { absolute: "Pedro Lucas — Sites e sistemas para negócios" },
   description: "Sites estratégicos, visualmente marcantes e desenvolvidos para transformar atenção em resultado.",
 };
 
 export default function Home() {
-  return <><MotionEngine /><Header revealAfterHero /><main><HeroConcept /><TechStrip /><ProjectsShowcase /><Manifesto /><Services /><Process /><About /><FinalCTA /></main><Footer /></>;
+  return <ProgressiveHome />;
 }

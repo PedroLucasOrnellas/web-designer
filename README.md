@@ -1,42 +1,33 @@
-# Portfólio — Pedro Lucas
+# Pedro Lucas — Sites e sistemas para negócios
 
-Landing page comercial em português para serviços de web design e desenvolvimento frontend. O projeto usa Next.js, TypeScript, Tailwind CSS, GSAP e Lenis, com rotas individuais para os três cases.
+Home comercial em React e TypeScript, preservando Next.js/Vinext, GSAP, fontes e assets do projeto.
 
-## Personalização rápida
+## Conteúdo e contato
 
-### Projetos e textos
+Edite data/portfolio.ts para projetos, quatro soluções, diferenciais, cinco etapas, FAQ e redes sociais.
+Configure NEXT_PUBLIC_CONTACT_URL no ambiente local (.env.local) e no ambiente de produção, com a URL definitiva de WhatsApp, agenda ou mailto:. Reinicie o servidor local após mudar a variável; gere um novo build para produção. Todos os CTAs usam contactUrl, exportado pelo mesmo arquivo. Sem configuração, o destino é /#contato; ainda não há envio de mensagem ou canal definitivo. Links sociais marcados como placeholder não são exibidos.
 
-Edite `data/portfolio.ts`. Este arquivo concentra projetos, descrições, tecnologias, serviços, processo e links sociais. Não há números ou resultados inventados; cada case inclui uma nota explícita para receber métricas reais no futuro.
+O bloco Sobre usa uma assinatura tipográfica; não exige retrato. A imagem cinematográfica existente permanece em public/images/hero-laptop-cinematic.png.
 
-### Contato e redes sociais
+## Rotas preservadas
 
-Em `data/portfolio.ts`, substitua os quatro itens de `socialLinks`. Depois, em `components/sections/FinalCTA.tsx`, troque o `href="#contato"` do botão circular pelo e-mail (`mailto:`), WhatsApp ou página de contato real. Remova o texto `CONTATO PENDENTE` quando concluir.
+- /
+- /hero-concept
+- /projetos/o-catalogo
+- /projetos/julie-doceria
+- /projetos/the-human-dataset
+- /lp-bolo/index.html
 
-### Retrato
+Os cases descrevem contexto, desafio, solução, decisões, disciplinas/tecnologias e impacto qualitativo, sem métricas comerciais presumidas. O domínio em metadataBase deve ser confirmado antes da publicação; a imagem social existente foi preservada.
 
-O bloco `components/sections/About.tsx` contém um placeholder integrado à composição. Para usar uma foto real, coloque o arquivo em `public/images/pedro-lucas.webp`, importe `Image` de `next/image` e substitua `.portrait-placeholder` por um `<Image fill ... />`. Preserve a classe `about-portrait` para manter o recorte e os elementos gráficos.
+## Desenvolvimento e verificação
 
-### Imagens e mockups dos cases
+- npm run dev
+- npm run lint
+- npx tsc --noEmit
+- npm run build
+- node --test tests/rendered-html.test.mjs (após build)
 
-Os mockups atuais são componentes CSS leves em `components/ui/ProjectVisual.tsx`. Para usar capturas reais, salve arquivos WebP ou AVIF em `public/projects/<slug>/` e substitua o conteúdo de `.browser-shell` por `next/image`. Use `sizes` e mantenha dimensões explícitas para evitar layout shift.
+O hero mantém máscaras, parallax discreto e CTA animado. Os títulos das seções usam IntersectionObserver; o processo mantém seu indicador de progresso. O FAQ usa details/summary nativos e o acordeão de projetos mantém operação por teclado. prefers-reduced-motion desativa movimento e preserva o conteúdo legível.
 
-### Links de projeto
-
-As páginas estão disponíveis em:
-
-- `/projetos/the-human-dataset`
-- `/projetos/julie-doceria`
-
-Inclua URLs externas reais apenas quando os projetos estiverem publicados.
-
-### Metadados e compartilhamento
-
-A imagem social fica em `public/og.png`. Antes do deploy definitivo, troque `metadataBase` em `app/layout.tsx` pelo domínio real do portfólio.
-
-## Desenvolvimento
-
-Use `npm run dev` para desenvolvimento local. Rode `npm run lint`, `npx tsc --noEmit` e `npm run build` antes de publicar.
-
-## Performance e acessibilidade
-
-As animações carregam de forma dinâmica em um único Client Component, são limpas ao desmontar e respeitam `prefers-reduced-motion`. O conteúdo principal permanece em Server Components. O layout usa HTML semântico, foco visível e estados legíveis em teclado e toque.
+Nenhum commit, push ou deploy faz parte desta alteração local.

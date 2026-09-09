@@ -15,6 +15,8 @@ export type Project = {
   imageAlt?: string;
   status: string;
   caseNote: string;
+  decisions: string;
+  impact: string;
   liveUrl?: string;
   liveUrlExternal?: boolean;
   liveUrlLabel?: string;
@@ -24,6 +26,8 @@ export type Service = {
   index: string;
   title: string;
   description: string;
+  delivery: string;
+  benefit: string;
   tag: string;
   className: string;
 };

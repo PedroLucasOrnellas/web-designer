@@ -5,6 +5,7 @@ import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { MotionEngine } from "@/components/motion/MotionEngine";
 import { ProjectVisual } from "@/components/ui/ProjectVisual";
+import { FinalCTA } from "@/components/sections/FinalCTA";
 import { projects } from "@/data/portfolio";
 
 export function generateStaticParams() {
@@ -41,8 +42,9 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
         : <Link className="case-live-link" href={project.liveUrl}>{project.liveUrlLabel ?? "Visitar site"} <span aria-hidden="true">→</span></Link>)}
       <div className="case-project-visual"><ProjectVisual project={project} compact /></div>
     </section>
-    <section className="case-story"><div><p className="section-kicker"><span /> CONTEXTO</p><h2>Clareza antes de <em>decoração.</em></h2></div><div className="case-columns"><article><small>O DESAFIO</small><p>{project.challenge}</p></article><article><small>A DIREÇÃO</small><p>{project.solution}</p></article></div></section>
+    <section className="case-story"><div><p className="section-kicker"><span /> CONTEXTO</p><h2>Clareza antes de <em>decoração.</em></h2></div><div className="case-columns"><article><small>O DESAFIO</small><p>{project.challenge}</p></article><article><small>A SOLUÇÃO</small><p>{project.solution}</p></article><article><small>DECISÕES DE DESIGN E DESENVOLVIMENTO</small><p>{project.decisions}</p></article><article><small>IMPACTO QUALITATIVO</small><p>{project.impact}</p></article></div></section>
     <section className="case-note"><span>NOTA DO CASE</span><p>{project.caseNote}</p></section>
     <Link href={`/projetos/${nextProject.slug}`} className="next-case"><small>PRÓXIMO CASE</small><span>{nextProject.name}</span><b>↗</b></Link>
+    <FinalCTA />
   </main><Footer /></>;
 }
