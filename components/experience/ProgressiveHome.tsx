@@ -18,7 +18,7 @@ export function ProgressiveHome() {
   const [activeService, setActiveService] = useState(0);
   const [activeProject, setActiveProject] = useState(0);
   const [projectDirection, setProjectDirection] = useState(1);
-  const [activeProcess, setActiveProcess] = useState(1);
+  const [activeProcess, setActiveProcess] = useState(0);
   const [activeFaq, setActiveFaq] = useState(0);
   const processRef = useRef<HTMLElement>(null);
   const project = projects[activeProject];
