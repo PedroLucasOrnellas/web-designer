@@ -52,6 +52,7 @@ export function ProgressiveHome() {
   const processRef = useRef<HTMLElement>(null);
   const trustRef = useRef<HTMLElement>(null);
   const faqRef = useRef<HTMLElement>(null);
+  const contactRef = useRef<HTMLElement>(null);
   const lenisRef = useRef<Lenis | null>(null);
   const activeServiceRef = useRef(0);
   const desiredServiceRef = useRef(0);
@@ -172,19 +173,71 @@ export function ProgressiveHome() {
     if (reducedMotion) return;
 
     let frame = 0;
+    let desktopStylesApplied = false;
+    const section = faqRef.current;
+    const nextSection = contactRef.current;
+    if (!section || !nextSection) return;
+    const faqItems = Array.from(section.querySelectorAll<HTMLElement>("[data-faq-item]"));
+    const buildStage = (value: number, start: number, end: number) => {
+      const stage = Math.min(1, Math.max(0, (value - start) / (end - start)));
+      return stage * stage * (3 - 2 * stage);
+    };
+    const clearDesktopMotion = () => {
+      ["--faq-content-opacity", "--faq-content-scale", "--faq-content-y", "--faq-content-blur", "--faq-darkness"].forEach((variable) => section.style.removeProperty(variable));
+      faqItems.forEach((item) => ["--faq-item-opacity", "--faq-item-x", "--faq-item-y", "--faq-item-scale", "--faq-plus-opacity"].forEach((variable) => item.style.removeProperty(variable)));
+      ["--contact-reveal-y", "--contact-label-opacity", "--contact-label-y", "--contact-title-1-opacity", "--contact-title-1-y", "--contact-title-2-opacity", "--contact-title-2-y", "--contact-title-3-opacity", "--contact-title-3-y", "--contact-copy-opacity", "--contact-copy-y", "--contact-cta-opacity", "--contact-cta-y", "--contact-glow-opacity", "--contact-glow-scale"].forEach((variable) => nextSection.style.removeProperty(variable));
+    };
     const update = () => {
       frame = 0;
-      const section = faqRef.current;
-      if (!section || window.innerWidth < 981) return;
+      if (window.innerWidth < 981) {
+        if (desktopStylesApplied) clearDesktopMotion();
+        desktopStylesApplied = false;
+        return;
+      }
+      desktopStylesApplied = true;
       const rect = section.getBoundingClientRect();
       const travel = Math.max(1, rect.height - window.innerHeight);
       const progress = Math.min(1, Math.max(0, -rect.top / travel));
-      const exitProgress = Math.min(1, Math.max(0, (progress - 0.64) / 0.32));
-      section.style.setProperty("--faq-content-opacity", String(1 - exitProgress * 1.1));
-      section.style.setProperty("--faq-content-scale", String(1 - exitProgress * 0.07));
-      section.style.setProperty("--faq-content-y", `${exitProgress * -7}vh`);
-      section.style.setProperty("--faq-content-blur", `${exitProgress * 5}px`);
-      section.style.setProperty("--faq-darkness", String(exitProgress));
+      const exitProgress = buildStage(progress, 0.34, 0.98);
+      const contactProgress = buildStage(progress, 0.16, 0.995);
+      const darkness = buildStage(progress, 0.68, 0.98);
+      section.style.setProperty("--faq-content-opacity", `${1 - exitProgress * 0.94}`);
+      section.style.setProperty("--faq-content-scale", `${1 - exitProgress * 0.055}`);
+      section.style.setProperty("--faq-content-y", "0px");
+      section.style.setProperty("--faq-content-blur", `${exitProgress * 2.5}px`);
+      section.style.setProperty("--faq-darkness", `${darkness * 0.18}`);
+      faqItems.forEach((item, index) => {
+        const itemExit = buildStage(exitProgress, 0.05 + index * 0.055, 0.58 + index * 0.055);
+        const centerOffset = (faqItems.length - 1) / 2 - index;
+        item.style.setProperty("--faq-item-opacity", `${1 - itemExit}`);
+        item.style.setProperty("--faq-item-x", "0px");
+        item.style.setProperty("--faq-item-y", `${itemExit * centerOffset * 18}px`);
+        item.style.setProperty("--faq-item-scale", `${1 - itemExit * 0.075}`);
+        item.style.setProperty("--faq-plus-opacity", `${1 - buildStage(itemExit, 0.05, 0.62)}`);
+      });
+      const planeBuild = buildStage(contactProgress, 0, 0.88);
+      const labelBuild = buildStage(contactProgress, 0.38, 0.58);
+      const title1Build = buildStage(contactProgress, 0.44, 0.66);
+      const title2Build = buildStage(contactProgress, 0.5, 0.72);
+      const title3Build = buildStage(contactProgress, 0.56, 0.78);
+      const copyBuild = buildStage(contactProgress, 0.64, 0.84);
+      const ctaBuild = buildStage(contactProgress, 0.72, 0.92);
+      const glowBuild = buildStage(contactProgress, 0.35, 0.88);
+      nextSection.style.setProperty("--contact-reveal-y", `${(1 - planeBuild) * 100}svh`);
+      nextSection.style.setProperty("--contact-label-opacity", `${labelBuild}`);
+      nextSection.style.setProperty("--contact-label-y", `${(1 - labelBuild) * 18}px`);
+      nextSection.style.setProperty("--contact-title-1-opacity", `${title1Build}`);
+      nextSection.style.setProperty("--contact-title-1-y", `${(1 - title1Build) * 34}px`);
+      nextSection.style.setProperty("--contact-title-2-opacity", `${title2Build}`);
+      nextSection.style.setProperty("--contact-title-2-y", `${(1 - title2Build) * 34}px`);
+      nextSection.style.setProperty("--contact-title-3-opacity", `${title3Build}`);
+      nextSection.style.setProperty("--contact-title-3-y", `${(1 - title3Build) * 34}px`);
+      nextSection.style.setProperty("--contact-copy-opacity", `${copyBuild}`);
+      nextSection.style.setProperty("--contact-copy-y", `${(1 - copyBuild) * 16}px`);
+      nextSection.style.setProperty("--contact-cta-opacity", `${ctaBuild}`);
+      nextSection.style.setProperty("--contact-cta-y", `${(1 - ctaBuild) * 18}px`);
+      nextSection.style.setProperty("--contact-glow-opacity", `${glowBuild}`);
+      nextSection.style.setProperty("--contact-glow-scale", `${0.7 + glowBuild * 0.4}`);
     };
     const onScroll = () => {
       if (!frame) frame = window.requestAnimationFrame(update);
@@ -196,6 +249,7 @@ export function ProgressiveHome() {
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onScroll);
       if (frame) window.cancelAnimationFrame(frame);
+      clearDesktopMotion();
     };
   }, []);
 
@@ -221,6 +275,12 @@ export function ProgressiveHome() {
       const rect = section.getBoundingClientRect();
       const travel = Math.max(1, rect.height - window.innerHeight);
       const progress = Math.min(1, Math.max(0, -rect.top / travel));
+      const ambientProgress = progress - 0.5;
+      section.style.setProperty("--projects-copy-x", `${ambientProgress * -8}px`);
+      section.style.setProperty("--projects-copy-y", `${ambientProgress * -4}px`);
+      section.style.setProperty("--projects-visual-y", `${ambientProgress * 10}px`);
+      section.style.setProperty("--projects-rail-x", "0px");
+      section.style.setProperty("--projects-glow-x", `${ambientProgress * 4}vw`);
       if (!chapterIsExiting && progress >= 0.56) chapterIsExiting = true;
       else if (chapterIsExiting && progress <= 0.48) chapterIsExiting = false;
       section.dataset.chapterTransition = chapterIsExiting ? "exiting" : "rest";
@@ -371,6 +431,10 @@ export function ProgressiveHome() {
     let chapterSnapInProgress = false;
     let nativeUnlockTimer = 0;
     let lastScrollY = window.scrollY;
+    const buildStage = (value: number, start: number, end: number) => {
+      const progress = Math.min(1, Math.max(0, (value - start) / (end - start)));
+      return progress * progress * (3 - 2 * progress);
+    };
     const update = () => {
       frame = 0;
       const section = processRef.current;
@@ -386,9 +450,29 @@ export function ProgressiveHome() {
       section.style.removeProperty("--process-system-blur");
       section.querySelectorAll<HTMLElement>("[data-process-step]").forEach((step) => {
         step.style.removeProperty("--assemble-y");
+        step.style.removeProperty("--assemble-x");
         step.style.removeProperty("--assemble-rotate");
+        step.style.removeProperty("--assemble-scale");
+        step.style.removeProperty("--assemble-opacity");
       });
       if (window.innerWidth < 981) {
+        section.style.removeProperty("--process-plane-y");
+        section.style.removeProperty("--process-plane-rotate");
+        section.style.removeProperty("--process-plane-scale");
+        section.style.removeProperty("--process-plane-opacity");
+        section.style.removeProperty("--process-label-opacity");
+        section.style.removeProperty("--process-label-x");
+        section.style.removeProperty("--process-title-line-1-opacity");
+        section.style.removeProperty("--process-title-line-1-y");
+        section.style.removeProperty("--process-title-line-2-opacity");
+        section.style.removeProperty("--process-title-line-2-y");
+        section.style.removeProperty("--process-copy-opacity");
+        section.style.removeProperty("--process-copy-y");
+        section.style.removeProperty("--process-grid-opacity");
+        section.style.removeProperty("--process-grid-y");
+        section.style.removeProperty("--process-reassurance-opacity");
+        section.style.removeProperty("--process-reassurance-y");
+        section.style.removeProperty("--process-reassurance-line");
         chapterHasArrived = false;
         chapterIsDeparting = false;
         section.dataset.chapterArrival = "waiting";
@@ -400,8 +484,44 @@ export function ProgressiveHome() {
       const travel = Math.max(1, rect.height - window.innerHeight);
       const progress = Math.min(0.999, Math.max(0, -rect.top / travel));
       const chapterProgress = Math.min(0.999, Math.max(0, (progress - 0.18) / 0.82));
-      if (!chapterHasArrived && rect.top <= window.innerHeight * 0.9) chapterHasArrived = true;
-      else if (chapterHasArrived && rect.top >= window.innerHeight * 1.02) chapterHasArrived = false;
+      const planeProgress = Math.min(1, Math.max(0, (window.innerHeight - rect.top) / (window.innerHeight * 0.92)));
+      const constructionProgress = Math.min(1, Math.max(0, (window.innerHeight - rect.top) / (window.innerHeight * 1.08)));
+      section.style.setProperty("--process-plane-y", `${(1 - planeProgress) * 18}vh`);
+      section.style.setProperty("--process-plane-rotate", `${(1 - planeProgress) * 8}deg`);
+      section.style.setProperty("--process-plane-scale", `${0.94 + planeProgress * 0.06}`);
+      section.style.setProperty("--process-plane-opacity", `${0.72 + planeProgress * 0.28}`);
+      const labelBuild = buildStage(constructionProgress, 0.34, 0.5);
+      const titleLine1Build = buildStage(constructionProgress, 0.42, 0.64);
+      const titleLine2Build = buildStage(constructionProgress, 0.5, 0.72);
+      const copyBuild = buildStage(constructionProgress, 0.58, 0.76);
+      const lineBuild = buildStage(constructionProgress, 0.62, 0.82);
+      const gridBuild = buildStage(constructionProgress, 0.68, 0.9);
+      const reassuranceBuild = buildStage(constructionProgress, 0.88, 0.995);
+      section.style.setProperty("--process-label-opacity", `${labelBuild}`);
+      section.style.setProperty("--process-label-x", `${(1 - labelBuild) * -34}px`);
+      section.style.setProperty("--process-title-line-1-opacity", `${titleLine1Build}`);
+      section.style.setProperty("--process-title-line-1-y", `${(1 - titleLine1Build) * 52}px`);
+      section.style.setProperty("--process-title-line-2-opacity", `${titleLine2Build}`);
+      section.style.setProperty("--process-title-line-2-y", `${(1 - titleLine2Build) * 52}px`);
+      section.style.setProperty("--process-copy-opacity", `${copyBuild}`);
+      section.style.setProperty("--process-copy-y", `${(1 - copyBuild) * 24}px`);
+      section.style.setProperty("--process-line-scale", `${lineBuild}`);
+      section.style.setProperty("--process-grid-opacity", `${gridBuild}`);
+      section.style.setProperty("--process-grid-y", `${(1 - gridBuild) * 32}px`);
+      section.style.setProperty("--process-reassurance-opacity", `${reassuranceBuild}`);
+      section.style.setProperty("--process-reassurance-y", `${(1 - reassuranceBuild) * 18}px`);
+      section.style.setProperty("--process-reassurance-line", `${reassuranceBuild}`);
+      section.querySelectorAll<HTMLElement>("[data-process-step]").forEach((step, index) => {
+        const stepBuild = buildStage(constructionProgress, 0.68 + index * 0.045, 0.84 + index * 0.035);
+        const direction = index % 2 === 0 ? 1 : -1;
+        step.style.setProperty("--assemble-y", `${(1 - stepBuild) * (48 + index * 7) * direction}px`);
+        step.style.setProperty("--assemble-x", `${(1 - stepBuild) * (index - 2) * 14}px`);
+        step.style.setProperty("--assemble-rotate", `${(1 - stepBuild) * direction * 1.8}deg`);
+        step.style.setProperty("--assemble-scale", `${0.94 + stepBuild * 0.06}`);
+        step.style.setProperty("--assemble-opacity", `${stepBuild}`);
+      });
+      if (!chapterHasArrived && planeProgress >= 0.96) chapterHasArrived = true;
+      else if (chapterHasArrived && planeProgress <= 0.82) chapterHasArrived = false;
       if (!chapterIsDeparting && progress >= 0.87) chapterIsDeparting = true;
       else if (chapterIsDeparting && progress <= 0.8) chapterIsDeparting = false;
       if (progress <= 0.72) chapterSnapArmed = true;
@@ -451,29 +571,158 @@ export function ProgressiveHome() {
 
     let frame = 0;
     let chapterHasArrived = false;
+    let chapterIsDeparting = false;
+    let desktopStylesApplied = false;
+    const section = trustRef.current;
+    const nextSection = faqRef.current;
+    if (!section) return;
+    const benefitElements = Array.from(section.querySelectorAll<HTMLElement>("[data-trust-benefit]"));
+    const trustMotionVariables = [
+      "--trust-heading-opacity", "--trust-heading-x", "--trust-line-scale", "--trust-signature-opacity", "--trust-signature-y",
+      "--trust-exit-opacity", "--trust-exit-scale", "--trust-exit-y", "--trust-continuity-exit-opacity", "--trust-continuity-exit-x",
+      "--trust-continuity-exit-y", "--trust-label-exit-opacity", "--trust-label-exit-x", "--trust-label-exit-y",
+      "--trust-title-line-1-exit-opacity", "--trust-title-line-1-exit-x", "--trust-title-line-1-exit-y", "--trust-title-line-1-exit-rotate",
+      "--trust-title-line-2-exit-opacity", "--trust-title-line-2-exit-x", "--trust-title-line-2-exit-y", "--trust-title-line-2-exit-rotate",
+      "--trust-copy-exit-opacity", "--trust-copy-exit-x", "--trust-copy-exit-y", "--trust-benefit-line-exit-scale",
+      "--trust-signature-exit-opacity", "--trust-signature-exit-x", "--trust-signature-exit-y", "--trust-signature-exit-scale",
+      "--trust-plane-y", "--trust-plane-rotate", "--trust-continuity-opacity", "--trust-label-opacity", "--trust-label-x",
+      "--trust-title-line-1-opacity", "--trust-title-line-1-y", "--trust-title-line-2-opacity", "--trust-title-line-2-y",
+      "--trust-copy-opacity", "--trust-copy-y", "--trust-benefit-line-scale", "--trust-signature-line-scale",
+    ];
+    const benefitMotionVariables = [
+      "--benefit-opacity", "--benefit-y", "--benefit-x", "--benefit-rotate",
+      "--benefit-exit-opacity", "--benefit-exit-x", "--benefit-exit-y", "--benefit-exit-rotate",
+    ];
+    const clearDesktopMotion = () => {
+      trustMotionVariables.forEach((variable) => section.style.removeProperty(variable));
+      benefitElements.forEach((benefit) => benefitMotionVariables.forEach((variable) => benefit.style.removeProperty(variable)));
+      if (nextSection) {
+        nextSection.style.removeProperty("--faq-entry-opacity");
+        nextSection.style.removeProperty("--faq-entry-scale");
+        nextSection.style.removeProperty("--faq-entry-blur");
+        nextSection.style.removeProperty("--faq-reveal-opacity");
+      }
+    };
+    const buildStage = (value: number, start: number, end: number) => {
+      const progress = Math.min(1, Math.max(0, (value - start) / (end - start)));
+      return progress * progress * (3 - 2 * progress);
+    };
     const update = () => {
       frame = 0;
-      const section = trustRef.current;
-      if (!section) return;
-      section.style.removeProperty("--trust-heading-opacity");
-      section.style.removeProperty("--trust-heading-x");
-      section.style.removeProperty("--trust-line-scale");
-      section.style.removeProperty("--trust-signature-opacity");
-      section.style.removeProperty("--trust-signature-y");
-      section.querySelectorAll<HTMLElement>("[data-trust-benefit]").forEach((benefit) => {
-        benefit.style.removeProperty("--benefit-opacity");
-        benefit.style.removeProperty("--benefit-y");
-        benefit.style.removeProperty("--benefit-blur");
-      });
       if (window.innerWidth < 981) {
+        if (desktopStylesApplied) clearDesktopMotion();
+        desktopStylesApplied = false;
         chapterHasArrived = false;
+        chapterIsDeparting = false;
         section.dataset.chapterArrival = "waiting";
+        section.dataset.chapterDeparture = "rest";
+        if (nextSection) {
+          nextSection.style.removeProperty("--faq-entry-opacity");
+          nextSection.style.removeProperty("--faq-entry-scale");
+          nextSection.style.removeProperty("--faq-entry-blur");
+          nextSection.style.removeProperty("--faq-reveal-opacity");
+          nextSection.dataset.chapterArrival = "arrived";
+        }
         return;
       }
+      desktopStylesApplied = true;
       const rect = section.getBoundingClientRect();
-      if (!chapterHasArrived && rect.top <= window.innerHeight * 0.68) chapterHasArrived = true;
-      else if (chapterHasArrived && rect.top >= window.innerHeight * 0.8) chapterHasArrived = false;
+      const travel = Math.max(1, rect.height - window.innerHeight);
+      const progress = Math.min(0.999, Math.max(0, -rect.top / travel));
+      const planeProgress = Math.min(1, Math.max(0, (window.innerHeight - rect.top) / (window.innerHeight * 0.92)));
+      const constructionProgress = Math.max(0, (window.innerHeight - rect.top) / (window.innerHeight * 1.08));
+      const continuityBuild = buildStage(constructionProgress, 0.28, 0.48);
+      const labelBuild = buildStage(constructionProgress, 0.36, 0.52);
+      const titleLine1Build = buildStage(constructionProgress, 0.44, 0.64);
+      const titleLine2Build = buildStage(constructionProgress, 0.52, 0.72);
+      const copyBuild = buildStage(constructionProgress, 0.58, 0.76);
+      const benefitLineBuild = buildStage(constructionProgress, 0.64, 0.82);
+      const signatureBuild = buildStage(constructionProgress, 0.86, 0.995);
+      const exitProgress = buildStage(progress, 0.38, 0.995);
+      const faqEntryProgress = buildStage(progress, 0.54, 0.995);
+      section.style.setProperty("--trust-plane-y", `${(1 - planeProgress) * 16}vh`);
+      section.style.setProperty("--trust-plane-rotate", `${(1 - planeProgress) * 6}deg`);
+      section.style.setProperty("--trust-continuity-opacity", `${continuityBuild}`);
+      section.style.setProperty("--trust-line-scale", `${continuityBuild}`);
+      section.style.setProperty("--trust-label-opacity", `${labelBuild}`);
+      section.style.setProperty("--trust-label-x", `${(1 - labelBuild) * -30}px`);
+      section.style.setProperty("--trust-title-line-1-opacity", `${titleLine1Build}`);
+      section.style.setProperty("--trust-title-line-1-y", `${(1 - titleLine1Build) * 48}px`);
+      section.style.setProperty("--trust-title-line-2-opacity", `${titleLine2Build}`);
+      section.style.setProperty("--trust-title-line-2-y", `${(1 - titleLine2Build) * 48}px`);
+      section.style.setProperty("--trust-copy-opacity", `${copyBuild}`);
+      section.style.setProperty("--trust-copy-y", `${(1 - copyBuild) * 22}px`);
+      section.style.setProperty("--trust-benefit-line-scale", `${benefitLineBuild}`);
+      section.style.setProperty("--trust-signature-opacity", `${signatureBuild}`);
+      section.style.setProperty("--trust-signature-y", `${(1 - signatureBuild) * 20}px`);
+      section.style.setProperty("--trust-signature-line-scale", `${signatureBuild}`);
+      section.style.setProperty("--trust-exit-opacity", `${1 - exitProgress * 0.94}`);
+      section.style.setProperty("--trust-exit-scale", `${1 + exitProgress * 0.16}`);
+      section.style.setProperty("--trust-exit-y", `${exitProgress * -2}vh`);
+      const continuityExit = buildStage(exitProgress, 0, 0.48);
+      const labelExit = buildStage(exitProgress, 0.05, 0.55);
+      const titleLine1Exit = buildStage(exitProgress, 0.12, 0.78);
+      const titleLine2Exit = buildStage(exitProgress, 0.2, 0.88);
+      const copyExit = buildStage(exitProgress, 0.26, 0.86);
+      const benefitLineExit = buildStage(exitProgress, 0.18, 0.82);
+      const signatureExit = buildStage(exitProgress, 0.42, 1);
+      section.style.setProperty("--trust-continuity-exit-opacity", `${1 - continuityExit}`);
+      section.style.setProperty("--trust-continuity-exit-x", `${continuityExit * 42}px`);
+      section.style.setProperty("--trust-continuity-exit-y", `${continuityExit * -8}px`);
+      section.style.setProperty("--trust-label-exit-opacity", `${1 - labelExit}`);
+      section.style.setProperty("--trust-label-exit-x", `${labelExit * -48}px`);
+      section.style.setProperty("--trust-label-exit-y", `${labelExit * -14}px`);
+      section.style.setProperty("--trust-title-line-1-exit-opacity", `${1 - titleLine1Exit}`);
+      section.style.setProperty("--trust-title-line-1-exit-x", `${titleLine1Exit * -5}vw`);
+      section.style.setProperty("--trust-title-line-1-exit-y", `${titleLine1Exit * -32}px`);
+      section.style.setProperty("--trust-title-line-1-exit-rotate", `${titleLine1Exit * -1.4}deg`);
+      section.style.setProperty("--trust-title-line-2-exit-opacity", `${1 - titleLine2Exit}`);
+      section.style.setProperty("--trust-title-line-2-exit-x", `${titleLine2Exit * 7}vw`);
+      section.style.setProperty("--trust-title-line-2-exit-y", `${titleLine2Exit * 38}px`);
+      section.style.setProperty("--trust-title-line-2-exit-rotate", `${titleLine2Exit * 1.6}deg`);
+      section.style.setProperty("--trust-copy-exit-opacity", `${1 - copyExit}`);
+      section.style.setProperty("--trust-copy-exit-x", `${copyExit * 3}vw`);
+      section.style.setProperty("--trust-copy-exit-y", `${copyExit * 26}px`);
+      section.style.setProperty("--trust-benefit-line-exit-scale", `${1 - benefitLineExit}`);
+      section.style.setProperty("--trust-signature-exit-opacity", `${1 - signatureExit}`);
+      section.style.setProperty("--trust-signature-exit-x", `${signatureExit * 4}vw`);
+      section.style.setProperty("--trust-signature-exit-y", `${signatureExit * 30}px`);
+      section.style.setProperty("--trust-signature-exit-scale", `${1 - signatureExit}`);
+      benefitElements.forEach((benefit, index) => {
+        const benefitStart = 0.62 + index * 0.07;
+        const originalDuration = 0.16 - index * 0.015;
+        const benefitBuild = buildStage(constructionProgress, benefitStart, benefitStart + originalDuration / 0.7);
+        const direction = index % 2 === 0 ? -1 : 1;
+        benefit.style.setProperty("--benefit-opacity", `${benefitBuild}`);
+        benefit.style.setProperty("--benefit-y", `${(1 - benefitBuild) * 34}px`);
+        benefit.style.setProperty("--benefit-x", `${(1 - benefitBuild) * direction * 24}px`);
+        benefit.style.setProperty("--benefit-rotate", `${(1 - benefitBuild) * direction * 1.4}deg`);
+        const benefitExit = buildStage(exitProgress, 0.22 + index * 0.1, 0.78 + index * 0.1);
+        const exitX = index === 0 ? -5 : index === 2 ? 5 : 0;
+        const exitY = index === 0 ? 44 : index === 1 ? -38 : 52;
+        const exitRotate = index === 0 ? -2 : index === 1 ? 1.4 : 2;
+        benefit.style.setProperty("--benefit-exit-opacity", `${1 - benefitExit}`);
+        benefit.style.setProperty("--benefit-exit-x", `${benefitExit * exitX}vw`);
+        benefit.style.setProperty("--benefit-exit-y", `${benefitExit * exitY}px`);
+        benefit.style.setProperty("--benefit-exit-rotate", `${benefitExit * exitRotate}deg`);
+      });
+      if (!chapterHasArrived && constructionProgress >= 0.96) chapterHasArrived = true;
+      else if (chapterHasArrived && constructionProgress <= 0.82) chapterHasArrived = false;
+      if (!chapterIsDeparting && progress >= 0.38) chapterIsDeparting = true;
+      else if (chapterIsDeparting && progress <= 0.32) chapterIsDeparting = false;
       section.dataset.chapterArrival = chapterHasArrived ? "arrived" : "waiting";
+      section.dataset.chapterDeparture = chapterIsDeparting ? "departing" : "rest";
+      if (nextSection) {
+        nextSection.style.setProperty("--faq-entry-opacity", `${faqEntryProgress}`);
+        nextSection.style.setProperty("--faq-entry-scale", `${0.86 + faqEntryProgress * 0.14}`);
+        nextSection.style.setProperty("--faq-entry-blur", `${(1 - faqEntryProgress) * 3}px`);
+        nextSection.style.setProperty("--faq-reveal-opacity", `${buildStage(faqEntryProgress, 0.24, 0.92)}`);
+        nextSection.dataset.chapterArrival = faqEntryProgress <= 0
+          ? "waiting"
+          : faqEntryProgress >= 1
+            ? "arrived"
+            : "arriving";
+      }
     };
     const onScroll = () => {
       if (!frame) frame = window.requestAnimationFrame(update);
@@ -485,6 +734,7 @@ export function ProgressiveHome() {
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onScroll);
       if (frame) window.cancelAnimationFrame(frame);
+      clearDesktopMotion();
     };
   }, []);
 
@@ -686,7 +936,10 @@ export function ProgressiveHome() {
           <div className={styles.processSystem}>
           <div className={styles.processHeading}>
             <StepLabel>05 / COMO FUNCIONA</StepLabel>
-            <h2 id="process-title">Você sabe onde está<br />e o que vem depois.</h2>
+            <h2 id="process-title" aria-label="Você sabe onde está e o que vem depois.">
+              <span className={styles.processTitleLine} aria-hidden="true"><span>Você sabe onde está</span></span>
+              <span className={styles.processTitleLine} aria-hidden="true"><span>e o que vem depois.</span></span>
+            </h2>
             <p>Cada etapa reduz incertezas sem exigir que você absorva o processo inteiro de uma vez.</p>
           </div>
           <div className={styles.processProgress} aria-hidden="true"><i style={{ width: `${((activeProcess + 1) / processSteps.length) * 100}%` }} /></div>
@@ -706,16 +959,21 @@ export function ProgressiveHome() {
 
       <section ref={trustRef} className={styles.trust} id="sobre" aria-labelledby="trust-title">
         <div className={styles.trustInner}>
+        <div className={styles.trustSystem}>
         <div className={styles.trustContinuity} aria-hidden="true"><span>UM SISTEMA · UMA RESPONSABILIDADE</span><i /></div>
         <div className={styles.trustHeading}>
           <StepLabel>06 / POR QUE TRABALHAR COMIGO</StepLabel>
-          <h2 id="trust-title">O projeto inteiro,<br />sem ruído.</h2>
+          <h2 id="trust-title" aria-label="O projeto inteiro, sem ruído.">
+            <span className={styles.trustTitleLine} aria-hidden="true"><span>O projeto inteiro,</span></span>
+            <span className={styles.trustTitleLine} aria-hidden="true"><span>sem ruído.</span></span>
+          </h2>
           <p>Você fala diretamente com quem entende o negócio, desenha a experiência e constrói a interface.</p>
         </div>
         <div className={styles.benefitList}>
           {benefits.slice(0, 3).map((benefit, index) => <article key={benefit.title} data-trust-benefit><span>{String(index + 1).padStart(2, "0")}</span><h3>{benefit.title}</h3><p>{benefit.description}</p></article>)}
         </div>
         <div className={styles.signature}><strong>Pedro Lucas<span>.</span></strong><p>Estratégia · Design · Frontend</p></div>
+        </div>
         </div>
       </section>
 
@@ -725,7 +983,7 @@ export function ProgressiveHome() {
         <div className={styles.faqList} data-has-active={activeFaq >= 0}>
           {faqs.map((faq, index) => {
             const active = activeFaq === index;
-            return <article className={active ? styles.isActive : undefined} key={faq.question}>
+            return <article className={active ? styles.isActive : undefined} key={faq.question} data-faq-item>
               <button type="button" onClick={() => setActiveFaq(active ? -1 : index)} aria-expanded={active} aria-controls={`faq-answer-${index}`}><span>{faq.question}</span><i aria-hidden="true">+</i></button>
               <div id={`faq-answer-${index}`} className={styles.faqAnswer} data-open={active} aria-hidden={!active}><div><p>{faq.answer}</p></div></div>
             </article>;
@@ -734,11 +992,13 @@ export function ProgressiveHome() {
         </div>
       </section>
 
-      <section className={styles.contact} id="contato" aria-labelledby="contact-title">
-        <StepLabel>08 / CONVERSAR</StepLabel>
-        <h2 id="contact-title"><span>Tem um site, sistema</span><span>ou ideia para tirar</span><span>do papel?</span></h2>
-        <p>Conte brevemente o que você precisa e receba uma direção inicial para o projeto.</p>
-        <Link href={contactUrl}>Conversar sobre o projeto <span aria-hidden="true">↗</span></Link>
+      <section ref={contactRef} className={styles.contactStage} id="contato" aria-labelledby="contact-title">
+        <div className={styles.contact}>
+          <StepLabel>08 / CONVERSAR</StepLabel>
+          <h2 id="contact-title"><span>Tem um site, sistema</span><span>ou ideia para tirar</span><span>do papel?</span></h2>
+          <p>Conte brevemente o que você precisa e receba uma direção inicial para o projeto.</p>
+          <Link href={contactUrl}>Conversar sobre o projeto <span aria-hidden="true">↗</span></Link>
+        </div>
       </section>
     </main>
     <footer className={styles.footer}><span>PL.</span><p>© {new Date().getFullYear()} Pedro Lucas</p><a href="#topo">Voltar ao topo ↑</a></footer>
