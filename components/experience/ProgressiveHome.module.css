@@ -372,7 +372,7 @@
   --trust-signature-exit-opacity:1;--trust-signature-exit-x:0vw;--trust-signature-exit-y:0px;--trust-signature-exit-scale:1;
   position:relative;
   z-index:3;
-  min-height:150svh;
+  min-height:190svh;
   margin-top:-30svh;
   padding:0;
   background:transparent;
@@ -460,8 +460,8 @@
   position:relative;
   z-index:4;
   display:block;
-  min-height:220svh;
-  margin-top:-100svh;
+  min-height:260svh;
+  margin-top:-140svh;
   padding:0;
   background:transparent;
 }
@@ -502,7 +502,7 @@
 .faq .faqIntro { align-self:center; }
 .faq .faqList[data-has-active="true"] article:not(.isActive) { opacity:min(.34,var(--faq-item-opacity,1)); }
 .faq .faqList article { opacity:var(--faq-item-opacity,1);transform:translate3d(var(--faq-item-x,0px),var(--faq-item-y,0px),0) scale(var(--faq-item-scale,1));transform-origin:right center;will-change:transform,opacity; }
-.contactStage { --contact-reveal-y:0svh;--contact-label-opacity:1;--contact-label-y:0px;--contact-title-1-opacity:1;--contact-title-1-y:0px;--contact-title-2-opacity:1;--contact-title-2-y:0px;--contact-title-3-opacity:1;--contact-title-3-y:0px;--contact-copy-opacity:1;--contact-copy-y:0px;--contact-cta-opacity:1;--contact-cta-y:0px;--contact-glow-opacity:1;--contact-glow-scale:1.1;position:relative;z-index:5;min-height:181svh;margin-top:-181svh;pointer-events:none; }
+.contactStage { --contact-reveal-y:0svh;--contact-label-opacity:1;--contact-label-y:0px;--contact-title-1-opacity:1;--contact-title-1-y:0px;--contact-title-2-opacity:1;--contact-title-2-y:0px;--contact-title-3-opacity:1;--contact-title-3-y:0px;--contact-copy-opacity:1;--contact-copy-y:0px;--contact-cta-opacity:1;--contact-cta-y:0px;--contact-glow-opacity:1;--contact-glow-scale:1.1;position:relative;z-index:5;min-height:221svh;margin-top:-221svh;pointer-events:none; }
 .contact { position:sticky;top:0;z-index:1;min-height:100svh;border-radius:clamp(28px,3vw,48px) clamp(28px,3vw,48px) 0 0;box-shadow:0 -28px 90px rgba(0,0,0,.28);transform:translate3d(0,var(--contact-reveal-y),0);transform-origin:bottom center;will-change:transform;pointer-events:auto; }
 .contact > .stepLabel { opacity:var(--contact-label-opacity);transform:translate3d(0,var(--contact-label-y),0);will-change:transform,opacity; }
 .contact h2 span { animation:none;will-change:transform,opacity; }
@@ -510,8 +510,9 @@
 .contact h2 span:nth-child(2) { opacity:var(--contact-title-2-opacity);transform:translate3d(0,var(--contact-title-2-y),0); }
 .contact h2 span:nth-child(3) { opacity:var(--contact-title-3-opacity);transform:translate3d(0,var(--contact-title-3-y),0); }
 .contact > p:not(.stepLabel) { opacity:var(--contact-copy-opacity);transform:translate3d(0,var(--contact-copy-y),0);will-change:transform,opacity; }
-.contact > a { position:relative;isolation:isolate;opacity:var(--contact-cta-opacity);transform:translate3d(0,var(--contact-cta-y),0);box-shadow:0 10px 28px rgba(0,0,0,.26),0 0 0 1px rgba(201,255,91,.12);transition:background 260ms ease,box-shadow 260ms ease;will-change:transform,opacity; }
+.contact > a { position:relative;isolation:isolate;overflow:hidden;opacity:var(--contact-cta-opacity);transform:translate3d(0,var(--contact-cta-y),0);box-shadow:0 10px 28px rgba(0,0,0,.26),0 0 0 1px rgba(201,255,91,.12);transition:background 260ms ease,box-shadow 260ms ease;will-change:transform,opacity; }
 .contact > a:hover { background:#fff;box-shadow:0 14px 34px rgba(0,0,0,.3),0 0 0 1px rgba(201,255,91,.28); }
+.contact > a::after { position:absolute;top:-30%;bottom:-30%;left:-32%;width:24%;content:"";pointer-events:none;background:linear-gradient(90deg,transparent,rgba(201,255,91,.34),transparent);filter:blur(1px);transform:translateX(-180%) skewX(-18deg);animation:contactCtaSheen 4.8s cubic-bezier(.45,0,.3,1) infinite; }
 
 .benefitList { position:relative; }
 .benefitList::before { position:absolute;top:-1px;left:0;width:100%;height:2px;content:"";background:#18181a;transform:scaleX(0);transform-origin:left;animation:sectionRule linear both;animation-timeline:view();animation-range:entry 5% entry 55%; }
@@ -545,6 +546,7 @@
 @keyframes contactLine { from { opacity:0;transform:translateY(45px);filter:blur(7px); } to { opacity:1;transform:none;filter:none; } }
 @keyframes contactCalm { from { opacity:0;transform:translateY(18px); } to { opacity:1;transform:none; } }
 @keyframes contactGlow { from { opacity:0;transform:scale(.65); } to { opacity:1;transform:scale(1.1); } }
+@keyframes contactCtaSheen { 0%,62% { transform:translateX(-180%) skewX(-18deg); } 80%,100% { transform:translateX(720%) skewX(-18deg); } }
 @media (max-width:980px) {
   .process { --process-entry-opacity:1;--process-heading-y:0px;--process-line-scale:1;--process-label-opacity:1;--process-label-x:0px;--process-title-line-1-opacity:1;--process-title-line-1-y:0px;--process-title-line-2-opacity:1;--process-title-line-2-y:0px;--process-copy-opacity:1;--process-copy-y:0px;--process-grid-opacity:1;--process-grid-y:0px;--process-reassurance-opacity:1;--process-reassurance-y:0px;--process-reassurance-line:1;min-height:auto;margin-top:0;padding:clamp(100px,11vw,170px) clamp(24px,5.5vw,88px);background:#dedbd2; }
   .processInner { position:relative;min-height:0;padding:0;overflow:visible;background:transparent;border-radius:0;box-shadow:none;opacity:1;transform:none; }
@@ -571,7 +573,8 @@
 }
 
 @media (prefers-reduced-motion:reduce) {
-  .header[data-hero-item],.heroCopy[data-hero-sequence] > *,.notebook,.notebook i,.heroGlow,.continueCue span,.projectCard .projectCopy,.projectCard .projectVisual,.projectNav > div .currentDot::after,.benefitList::before,.solutions::before,.projects::before,.trust::before,.faq::before,.contact::before,.contact h2 span,.contact > a::before { animation:none!important;opacity:1;transform:none;clip-path:none;filter:none; }
+  .header[data-hero-item],.heroCopy[data-hero-sequence] > *,.notebook,.notebook i,.heroGlow,.continueCue span,.projectCard .projectCopy,.projectCard .projectVisual,.projectNav > div .currentDot::after,.benefitList::before,.solutions::before,.projects::before,.trust::before,.faq::before,.contact::before,.contact h2 span,.contact > a::before,.contact > a::after { animation:none!important;opacity:1;transform:none;clip-path:none;filter:none; }
+  .contact > a::after { display:none; }
   .process { --process-entry-opacity:1;--process-heading-y:0px;--process-line-scale:1;--process-label-opacity:1;--process-label-x:0px;--process-title-line-1-opacity:1;--process-title-line-1-y:0px;--process-title-line-2-opacity:1;--process-title-line-2-y:0px;--process-copy-opacity:1;--process-copy-y:0px;--process-grid-opacity:1;--process-grid-y:0px;--process-reassurance-opacity:1;--process-reassurance-y:0px;--process-reassurance-line:1;min-height:auto;margin-top:0;padding:clamp(100px,11vw,170px) clamp(24px,5.5vw,88px);background:#dedbd2; }
   .processInner { position:relative;min-height:0;padding:0;overflow:visible;background:transparent;border-radius:0;box-shadow:none;opacity:1;transform:none; }
   .processSystem { opacity:1;filter:none;transform:none; }
