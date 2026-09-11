@@ -512,8 +512,8 @@
 .contact > p:not(.stepLabel) { opacity:var(--contact-copy-opacity);transform:translate3d(0,var(--contact-copy-y),0);will-change:transform,opacity; }
 .contact > a { position:relative;isolation:isolate;opacity:var(--contact-cta-opacity);transform:translate3d(0,var(--contact-cta-y),0);box-shadow:0 10px 28px rgba(0,0,0,.26),0 0 0 1px rgba(201,255,91,.12);transition:background 260ms ease,box-shadow 260ms ease;will-change:transform,opacity; }
 .contact > a:hover { background:#fff;box-shadow:0 14px 34px rgba(0,0,0,.3),0 0 0 1px rgba(201,255,91,.28); }
-.contact > a::before { position:absolute;inset:-1px;border:1px solid rgba(201,255,91,.7);border-radius:inherit;content:"";pointer-events:none;opacity:0; }
-.contactStage[data-cta-pulse="played"] .contact > a::before { animation:contactCtaPulseOnce 760ms cubic-bezier(.22,1,.36,1) 1; }
+.contact > a::before { position:absolute;inset:0;border-radius:inherit;content:"";pointer-events:none;opacity:0; }
+.contactStage[data-cta-pulse="active"] .contact > a::before { animation:contactCtaPulse 1400ms cubic-bezier(.16,1,.3,1) 1; }
 
 .benefitList { position:relative; }
 .benefitList::before { position:absolute;top:-1px;left:0;width:100%;height:2px;content:"";background:#18181a;transform:scaleX(0);transform-origin:left;animation:sectionRule linear both;animation-timeline:view();animation-range:entry 5% entry 55%; }
@@ -547,7 +547,7 @@
 @keyframes contactLine { from { opacity:0;transform:translateY(45px);filter:blur(7px); } to { opacity:1;transform:none;filter:none; } }
 @keyframes contactCalm { from { opacity:0;transform:translateY(18px); } to { opacity:1;transform:none; } }
 @keyframes contactGlow { from { opacity:0;transform:scale(.65); } to { opacity:1;transform:scale(1.1); } }
-@keyframes contactCtaPulseOnce { 0% { opacity:0;transform:scale(.98);box-shadow:0 0 0 rgba(201,255,91,0); } 28% { opacity:.78;box-shadow:0 0 24px rgba(201,255,91,.28); } 100% { opacity:0;transform:scale(1.2);box-shadow:0 0 38px rgba(201,255,91,0); } }
+@keyframes contactCtaPulse { 0% { opacity:.9;transform:scale(.99);box-shadow:0 0 30px 10px rgba(201,255,91,.42); } 45% { opacity:.46;transform:scale(1.08);box-shadow:0 0 38px 13px rgba(201,255,91,.2); } 100% { opacity:0;transform:scale(1.22);box-shadow:0 0 54px 18px rgba(201,255,91,0); } }
 @media (max-width:980px) {
   .process { --process-entry-opacity:1;--process-heading-y:0px;--process-line-scale:1;--process-label-opacity:1;--process-label-x:0px;--process-title-line-1-opacity:1;--process-title-line-1-y:0px;--process-title-line-2-opacity:1;--process-title-line-2-y:0px;--process-copy-opacity:1;--process-copy-y:0px;--process-grid-opacity:1;--process-grid-y:0px;--process-reassurance-opacity:1;--process-reassurance-y:0px;--process-reassurance-line:1;min-height:auto;margin-top:0;padding:clamp(100px,11vw,170px) clamp(24px,5.5vw,88px);background:#dedbd2; }
   .processInner { position:relative;min-height:0;padding:0;overflow:visible;background:transparent;border-radius:0;box-shadow:none;opacity:1;transform:none; }

@@ -174,7 +174,7 @@ export function ProgressiveHome() {
 
     let frame = 0;
     let desktopStylesApplied = false;
-    let ctaPulsePlayed = false;
+    let ctaPulseArmed = true;
     const section = faqRef.current;
     const nextSection = contactRef.current;
     if (!section || !nextSection) return;
@@ -239,9 +239,12 @@ export function ProgressiveHome() {
       nextSection.style.setProperty("--contact-cta-y", `${(1 - ctaBuild) * 18}px`);
       nextSection.style.setProperty("--contact-glow-opacity", `${glowBuild}`);
       nextSection.style.setProperty("--contact-glow-scale", `${0.7 + glowBuild * 0.4}`);
-      if (!ctaPulsePlayed && contactProgress >= 0.995) {
-        ctaPulsePlayed = true;
-        nextSection.dataset.ctaPulse = "played";
+      if (ctaBuild <= 0.05) {
+        ctaPulseArmed = true;
+        delete nextSection.dataset.ctaPulse;
+      } else if (ctaPulseArmed && ctaBuild >= 0.98) {
+        ctaPulseArmed = false;
+        nextSection.dataset.ctaPulse = "active";
       }
     };
     const onScroll = () => {
