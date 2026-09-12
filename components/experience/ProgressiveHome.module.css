@@ -343,6 +343,19 @@
 .process .reassurance { opacity:var(--process-reassurance-opacity);transform:translate3d(0,var(--process-reassurance-y),0);will-change:transform,opacity; }
 .process .reassurance i { transform:scale(var(--process-reassurance-line)); }
 
+/* Fit the five-step story inside a laptop viewport, including its longest copy. */
+@media(min-width:981px) {
+  .processInner { padding-block:clamp(24px,4svh,48px); }
+  .processHeading { column-gap:32px;margin-bottom:clamp(24px,4svh,36px); }
+  .processHeading h2 { font-size:clamp(36px,4vw,60px); }
+  .processHeading > p:not(.stepLabel) { font-size:15px;line-height:1.5; }
+  .processSteps button { min-height:0;padding:clamp(14px,1.6vw,24px); }
+  .processSteps button strong { margin-top:clamp(24px,5svh,44px);font-size:clamp(15px,1.4vw,22px);line-height:1.2;overflow-wrap:normal; }
+  .processDescription { margin-top:16px;font-size:14px;line-height:1.5; }
+  .process .reassurance { margin-top:24px; }
+}
+
+
 .trust {
   --trust-heading-opacity:0;
   --trust-heading-x:-82px;
