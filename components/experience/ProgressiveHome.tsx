@@ -47,6 +47,7 @@ export function ProgressiveHome() {
   const [activeProcess, setActiveProcess] = useState(0);
   const [activeFaq, setActiveFaq] = useState(0);
   const openingRef = useRef<HTMLDivElement>(null);
+  const heroRef = useRef<HTMLElement>(null);
   const solutionsRef = useRef<HTMLElement>(null);
   const projectsRef = useRef<HTMLElement>(null);
   const processRef = useRef<HTMLElement>(null);
@@ -111,6 +112,20 @@ export function ProgressiveHome() {
     serviceTimersRef.current.forEach(window.clearTimeout);
     serviceTimersRef.current = [];
   }, []);
+
+  const moveHeroLight = (event: React.PointerEvent<HTMLElement>) => {
+    if (event.pointerType === "touch" || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const rect = event.currentTarget.getBoundingClientRect();
+    const x = (event.clientX - rect.left) / rect.width - 0.5;
+    const y = (event.clientY - rect.top) / rect.height - 0.5;
+    event.currentTarget.style.setProperty("--light-pointer-x", `${x * 18}px`);
+    event.currentTarget.style.setProperty("--light-pointer-y", `${y * 14}px`);
+  };
+
+  const resetHeroLight = () => {
+    heroRef.current?.style.setProperty("--light-pointer-x", "0px");
+    heroRef.current?.style.setProperty("--light-pointer-y", "0px");
+  };
 
   useEffect(() => {
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -786,8 +801,14 @@ export function ProgressiveHome() {
     <main className={styles.page} data-progressive-home>
       <div ref={openingRef} className={styles.storyOpening} data-opening-scene="hero">
       <div className={styles.openingSticky}>
-      <section className={styles.hero} id="topo" aria-labelledby="hero-title">
-        <div className={styles.heroGlow} aria-hidden="true" />
+      <section ref={heroRef} className={styles.hero} id="topo" aria-labelledby="hero-title" onPointerMove={moveHeroLight} onPointerLeave={resetHeroLight}>
+        <div className={styles.heroLightField} aria-hidden="true">
+          <span className={styles.heroLightPrimary} />
+          <span className={styles.heroLightSecondary} />
+          <span className={styles.heroLightBridge} />
+          <i className={styles.heroLightGrid} />
+          <i className={styles.heroLightGrain} />
+        </div>
         <header className={styles.header} data-hero-item>
           <Link href="#topo" className={styles.brand} aria-label="Pedro Lucas — início">Pedro Lucas<span>.</span></Link>
           <nav aria-label="Navegação principal">
