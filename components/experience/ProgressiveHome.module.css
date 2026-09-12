@@ -331,11 +331,14 @@
 .processSteps button:nth-child(5) { --assemble-y:54px;--assemble-rotate:1.6deg; }
 .process[data-chapter-departure="departing"] { --process-system-opacity:.42;--process-system-scale:.88;--process-system-y:-7vh;--process-system-blur:3px; }
 .processSteps button strong { transition:transform 320ms ease; }
-.processDescription { max-height:0;margin-top:0;overflow:hidden;opacity:0;transform:translateY(10px);transition:max-height 420ms ease,margin 320ms ease,opacity 240ms ease,transform 320ms ease; }
+.processSteps { grid-template-columns:repeat(5,minmax(0,1fr));grid-auto-rows:1fr; }
+.processSteps button { min-width:0;display:flex;flex-direction:column;align-items:stretch;overflow:visible;overflow-wrap:anywhere; }
+/* Keep descriptions in flow so switching steps never changes the card height. */
+.processDescription { margin-top:18px;opacity:0;transform:translateY(10px);transition:opacity 320ms ease,transform 420ms ease; }
 .processSteps button[data-state="complete"] { color:#45423d;background:rgba(255,255,255,.22); }
 .processSteps button[data-state="complete"] > span:first-child { color:#617f24; }
 .processSteps button.isActive { transform:translate3d(var(--assemble-x),calc(var(--assemble-y) - 12px),0) rotate(var(--assemble-rotate)) scale(var(--assemble-scale)); }
-.processSteps button.isActive .processDescription { max-height:130px;margin-top:18px;opacity:1;transform:none; }
+.processSteps button.isActive .processDescription { opacity:1;transform:none; }
 .processSteps button.isActive strong { transform:translateY(-4px); }
 .process .reassurance { opacity:var(--process-reassurance-opacity);transform:translate3d(0,var(--process-reassurance-y),0);will-change:transform,opacity; }
 .process .reassurance i { transform:scale(var(--process-reassurance-line)); }
@@ -512,8 +515,16 @@
 .contact > p:not(.stepLabel) { opacity:var(--contact-copy-opacity);transform:translate3d(0,var(--contact-copy-y),0);will-change:transform,opacity; }
 .contact > a { position:relative;isolation:isolate;opacity:var(--contact-cta-opacity);transform:translate3d(0,var(--contact-cta-y),0);box-shadow:0 10px 28px rgba(0,0,0,.26),0 0 0 1px rgba(201,255,91,.12);transition:background 260ms ease,box-shadow 260ms ease;will-change:transform,opacity; }
 .contact > a:hover { background:#fff;box-shadow:0 14px 34px rgba(0,0,0,.3),0 0 0 1px rgba(201,255,91,.28); }
-.contact > a::before { position:absolute;inset:0;border-radius:inherit;content:"";pointer-events:none;opacity:0; }
-.contactStage[data-cta-pulse="active"] .contact > a::before { animation:contactCtaPulse 1400ms cubic-bezier(.16,1,.3,1) 1; }
+.contact > a::before,.contact > a::after { position:absolute;inset:-24px -36px;z-index:-1;border:0;border-radius:50%;content:"";pointer-events:none;background:radial-gradient(ellipse,rgba(201,255,91,.6) 0%,rgba(201,255,91,.24) 36%,rgba(201,255,91,0) 72%);filter:blur(14px);opacity:0;will-change:transform,opacity; }
+.contactStage[data-cta-pulse="active"] .contact > a::before,
+.contactStage[data-cta-pulse="active"] .contact > a::after { animation:contactCtaPulse 4800ms linear infinite; }
+.contactStage[data-cta-pulse="active"] .contact > a::after { animation-delay:-2400ms; }
+@media(max-width:980px) {
+  .processSteps { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  .contact > a::before,.contact > a::after { animation:contactCtaPulse 4800ms linear infinite; }
+  .contact > a::after { animation-delay:-2400ms; }
+}
+@media(max-width:640px) { .processSteps { grid-template-columns:1fr; } }
 
 .benefitList { position:relative; }
 .benefitList::before { position:absolute;top:-1px;left:0;width:100%;height:2px;content:"";background:#18181a;transform:scaleX(0);transform-origin:left;animation:sectionRule linear both;animation-timeline:view();animation-range:entry 5% entry 55%; }
@@ -547,7 +558,14 @@
 @keyframes contactLine { from { opacity:0;transform:translateY(45px);filter:blur(7px); } to { opacity:1;transform:none;filter:none; } }
 @keyframes contactCalm { from { opacity:0;transform:translateY(18px); } to { opacity:1;transform:none; } }
 @keyframes contactGlow { from { opacity:0;transform:scale(.65); } to { opacity:1;transform:scale(1.1); } }
-@keyframes contactCtaPulse { 0% { opacity:.9;transform:scale(.99);box-shadow:0 0 30px 10px rgba(201,255,91,.42); } 45% { opacity:.46;transform:scale(1.08);box-shadow:0 0 38px 13px rgba(201,255,91,.2); } 100% { opacity:0;transform:scale(1.22);box-shadow:0 0 54px 18px rgba(201,255,91,0); } }
+/* Invisible endpoints and overlapping waves avoid a visible restart. */
+@keyframes contactCtaPulse {
+  0% { opacity:0;transform:scale(.78); }
+  10% { opacity:.85;transform:scale(.88); }
+  40% { opacity:.46;transform:scale(1.18); }
+  70% { opacity:.16;transform:scale(1.48); }
+  100% { opacity:0;transform:scale(1.78); }
+}
 @media (max-width:980px) {
   .process { --process-entry-opacity:1;--process-heading-y:0px;--process-line-scale:1;--process-label-opacity:1;--process-label-x:0px;--process-title-line-1-opacity:1;--process-title-line-1-y:0px;--process-title-line-2-opacity:1;--process-title-line-2-y:0px;--process-copy-opacity:1;--process-copy-y:0px;--process-grid-opacity:1;--process-grid-y:0px;--process-reassurance-opacity:1;--process-reassurance-y:0px;--process-reassurance-line:1;min-height:auto;margin-top:0;padding:clamp(100px,11vw,170px) clamp(24px,5.5vw,88px);background:#dedbd2; }
   .processInner { position:relative;min-height:0;padding:0;overflow:visible;background:transparent;border-radius:0;box-shadow:none;opacity:1;transform:none; }
@@ -575,7 +593,7 @@
 
 @media (prefers-reduced-motion:reduce) {
   .header[data-hero-item],.heroCopy[data-hero-sequence] > *,.notebook,.notebook i,.heroGlow,.continueCue span,.projectCard .projectCopy,.projectCard .projectVisual,.projectNav > div .currentDot::after,.benefitList::before,.solutions::before,.projects::before,.trust::before,.faq::before,.contact::before,.contact h2 span,.contact > a::before { animation:none!important;opacity:1;transform:none;clip-path:none;filter:none; }
-  .contact > a::before { display:none; }
+  .contact > a::before,.contact > a::after { display:none;animation:none!important; }
   .process { --process-entry-opacity:1;--process-heading-y:0px;--process-line-scale:1;--process-label-opacity:1;--process-label-x:0px;--process-title-line-1-opacity:1;--process-title-line-1-y:0px;--process-title-line-2-opacity:1;--process-title-line-2-y:0px;--process-copy-opacity:1;--process-copy-y:0px;--process-grid-opacity:1;--process-grid-y:0px;--process-reassurance-opacity:1;--process-reassurance-y:0px;--process-reassurance-line:1;min-height:auto;margin-top:0;padding:clamp(100px,11vw,170px) clamp(24px,5.5vw,88px);background:#dedbd2; }
   .processInner { position:relative;min-height:0;padding:0;overflow:visible;background:transparent;border-radius:0;box-shadow:none;opacity:1;transform:none; }
   .processSystem { opacity:1;filter:none;transform:none; }
