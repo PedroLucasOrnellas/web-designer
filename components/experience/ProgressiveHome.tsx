@@ -580,20 +580,18 @@ export function ProgressiveHome() {
     if (!section) return;
     const benefitElements = Array.from(section.querySelectorAll<HTMLElement>("[data-trust-benefit]"));
     const trustMotionVariables = [
-      "--trust-heading-opacity", "--trust-heading-x", "--trust-line-scale", "--trust-signature-opacity", "--trust-signature-y",
-      "--trust-exit-opacity", "--trust-exit-scale", "--trust-exit-y", "--trust-continuity-exit-opacity", "--trust-continuity-exit-x",
-      "--trust-continuity-exit-y", "--trust-label-exit-opacity", "--trust-label-exit-x", "--trust-label-exit-y",
+      "--trust-signature-opacity", "--trust-signature-y", "--trust-exit-opacity", "--trust-exit-scale", "--trust-exit-y",
+      "--trust-label-exit-opacity", "--trust-label-exit-x", "--trust-label-exit-y",
       "--trust-title-line-1-exit-opacity", "--trust-title-line-1-exit-x", "--trust-title-line-1-exit-y", "--trust-title-line-1-exit-rotate",
       "--trust-title-line-2-exit-opacity", "--trust-title-line-2-exit-x", "--trust-title-line-2-exit-y", "--trust-title-line-2-exit-rotate",
       "--trust-copy-exit-opacity", "--trust-copy-exit-x", "--trust-copy-exit-y", "--trust-benefit-line-exit-scale",
       "--trust-signature-exit-opacity", "--trust-signature-exit-x", "--trust-signature-exit-y", "--trust-signature-exit-scale",
-      "--trust-plane-y", "--trust-plane-rotate", "--trust-continuity-opacity", "--trust-label-opacity", "--trust-label-x",
+      "--trust-plane-y", "--trust-plane-rotate", "--trust-label-opacity", "--trust-label-x",
       "--trust-title-line-1-opacity", "--trust-title-line-1-y", "--trust-title-line-2-opacity", "--trust-title-line-2-y",
       "--trust-copy-opacity", "--trust-copy-y", "--trust-benefit-line-scale", "--trust-signature-line-scale",
     ];
     const benefitMotionVariables = [
-      "--benefit-opacity", "--benefit-y", "--benefit-x", "--benefit-rotate",
-      "--benefit-exit-opacity", "--benefit-exit-x", "--benefit-exit-y", "--benefit-exit-rotate",
+      "--benefit-opacity", "--benefit-y", "--benefit-exit-opacity", "--benefit-exit-y",
     ];
     const clearDesktopMotion = () => {
       trustMotionVariables.forEach((variable) => section.style.removeProperty(variable));
@@ -633,7 +631,6 @@ export function ProgressiveHome() {
       const progress = Math.min(0.999, Math.max(0, -rect.top / travel));
       const planeProgress = Math.min(1, Math.max(0, (window.innerHeight - rect.top) / (window.innerHeight * 0.92)));
       const constructionProgress = Math.max(0, (window.innerHeight - rect.top) / (window.innerHeight * 1.08));
-      const continuityBuild = buildStage(constructionProgress, 0.28, 0.48);
       const labelBuild = buildStage(constructionProgress, 0.36, 0.52);
       const titleLine1Build = buildStage(constructionProgress, 0.44, 0.64);
       const titleLine2Build = buildStage(constructionProgress, 0.52, 0.72);
@@ -644,8 +641,6 @@ export function ProgressiveHome() {
       const faqEntryProgress = buildStage(progress, 0.54, 0.995);
       section.style.setProperty("--trust-plane-y", `${(1 - planeProgress) * 16}vh`);
       section.style.setProperty("--trust-plane-rotate", `${(1 - planeProgress) * 6}deg`);
-      section.style.setProperty("--trust-continuity-opacity", `${continuityBuild}`);
-      section.style.setProperty("--trust-line-scale", `${continuityBuild}`);
       section.style.setProperty("--trust-label-opacity", `${labelBuild}`);
       section.style.setProperty("--trust-label-x", `${(1 - labelBuild) * -30}px`);
       section.style.setProperty("--trust-title-line-1-opacity", `${titleLine1Build}`);
@@ -661,16 +656,12 @@ export function ProgressiveHome() {
       section.style.setProperty("--trust-exit-opacity", `${1 - exitProgress * 0.94}`);
       section.style.setProperty("--trust-exit-scale", `${1 + exitProgress * 0.16}`);
       section.style.setProperty("--trust-exit-y", `${exitProgress * -2}vh`);
-      const continuityExit = buildStage(exitProgress, 0, 0.48);
       const labelExit = buildStage(exitProgress, 0.05, 0.55);
       const titleLine1Exit = buildStage(exitProgress, 0.12, 0.78);
       const titleLine2Exit = buildStage(exitProgress, 0.2, 0.88);
       const copyExit = buildStage(exitProgress, 0.26, 0.86);
       const benefitLineExit = buildStage(exitProgress, 0.18, 0.82);
       const signatureExit = buildStage(exitProgress, 0.42, 1);
-      section.style.setProperty("--trust-continuity-exit-opacity", `${1 - continuityExit}`);
-      section.style.setProperty("--trust-continuity-exit-x", `${continuityExit * 42}px`);
-      section.style.setProperty("--trust-continuity-exit-y", `${continuityExit * -8}px`);
       section.style.setProperty("--trust-label-exit-opacity", `${1 - labelExit}`);
       section.style.setProperty("--trust-label-exit-x", `${labelExit * -48}px`);
       section.style.setProperty("--trust-label-exit-y", `${labelExit * -14}px`);
@@ -691,22 +682,13 @@ export function ProgressiveHome() {
       section.style.setProperty("--trust-signature-exit-y", `${signatureExit * 30}px`);
       section.style.setProperty("--trust-signature-exit-scale", `${1 - signatureExit}`);
       benefitElements.forEach((benefit, index) => {
-        const benefitStart = 0.62 + index * 0.07;
-        const originalDuration = 0.16 - index * 0.015;
-        const benefitBuild = buildStage(constructionProgress, benefitStart, benefitStart + originalDuration / 0.7);
-        const direction = index % 2 === 0 ? -1 : 1;
+        const benefitStart = 0.62 + index * 0.06;
+        const benefitBuild = buildStage(constructionProgress, benefitStart, benefitStart + 0.2);
         benefit.style.setProperty("--benefit-opacity", `${benefitBuild}`);
-        benefit.style.setProperty("--benefit-y", `${(1 - benefitBuild) * 34}px`);
-        benefit.style.setProperty("--benefit-x", `${(1 - benefitBuild) * direction * 24}px`);
-        benefit.style.setProperty("--benefit-rotate", `${(1 - benefitBuild) * direction * 1.4}deg`);
+        benefit.style.setProperty("--benefit-y", `${(1 - benefitBuild) * 28}px`);
         const benefitExit = buildStage(exitProgress, 0.22 + index * 0.1, 0.78 + index * 0.1);
-        const exitX = index === 0 ? -5 : index === 2 ? 5 : 0;
-        const exitY = index === 0 ? 44 : index === 1 ? -38 : 52;
-        const exitRotate = index === 0 ? -2 : index === 1 ? 1.4 : 2;
         benefit.style.setProperty("--benefit-exit-opacity", `${1 - benefitExit}`);
-        benefit.style.setProperty("--benefit-exit-x", `${benefitExit * exitX}vw`);
-        benefit.style.setProperty("--benefit-exit-y", `${benefitExit * exitY}px`);
-        benefit.style.setProperty("--benefit-exit-rotate", `${benefitExit * exitRotate}deg`);
+        benefit.style.setProperty("--benefit-exit-y", `${benefitExit * -28}px`);
       });
       if (!chapterHasArrived && constructionProgress >= 0.96) chapterHasArrived = true;
       else if (chapterHasArrived && constructionProgress <= 0.82) chapterHasArrived = false;
@@ -965,14 +947,13 @@ export function ProgressiveHome() {
       <section ref={trustRef} className={styles.trust} id="sobre" aria-labelledby="trust-title">
         <div className={styles.trustInner}>
         <div className={styles.trustSystem}>
-        <div className={styles.trustContinuity} aria-hidden="true"><span>UM SISTEMA · UMA RESPONSABILIDADE</span><i /></div>
         <div className={styles.trustHeading}>
           <StepLabel>06 / POR QUE TRABALHAR COMIGO</StepLabel>
-          <h2 id="trust-title" aria-label="O projeto inteiro, sem ruído.">
-            <span className={styles.trustTitleLine} aria-hidden="true"><span>O projeto inteiro,</span></span>
-            <span className={styles.trustTitleLine} aria-hidden="true"><span>sem ruído.</span></span>
+          <h2 id="trust-title" aria-label="Do plano à entrega.">
+            <span className={styles.trustTitleLine} aria-hidden="true"><span>Do plano</span></span>
+            <span className={styles.trustTitleLine} aria-hidden="true"><span>à entrega.</span></span>
           </h2>
-          <p>Você fala diretamente com quem entende o negócio, desenha a experiência e constrói a interface.</p>
+          <p>Estratégia, design e desenvolvimento direto com quem faz.</p>
         </div>
         <div className={styles.benefitList}>
           {benefits.slice(0, 3).map((benefit, index) => <article key={benefit.title} data-trust-benefit><span>{String(index + 1).padStart(2, "0")}</span><h3>{benefit.title}</h3><p>{benefit.description}</p></article>)}

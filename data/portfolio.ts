@@ -107,9 +107,9 @@ export const processSteps: ProcessStep[] = [
 ];
 
 export const benefits = [
-  { title: "Uma direção, do início ao fim", description: "Estratégia, design e desenvolvimento conectados ao mesmo objetivo de negócio." },
-  { title: "Feito para o seu contexto", description: "Conteúdo, fluxos e interfaces personalizados, sem encaixar sua marca em um template genérico." },
-  { title: "Pronto para diferentes telas", description: "Responsividade e performance consideradas desde o design até a implementação." },
+  { title: "Direção única", description: "Estratégia, design e desenvolvimento guiados pelo mesmo objetivo." },
+  { title: "Sob medida", description: "Conteúdo e interface pensados para o contexto do seu negócio." },
+  { title: "Em qualquer tela", description: "Experiência clara e responsiva no celular, tablet e desktop." },
   { title: "Contato direto com quem faz", description: "Comunicação próxima, etapas claras e espaço para revisar as decisões durante o projeto." },
   { title: "Acompanhamento até a publicação", description: "Validação da entrega e orientação para colocar a experiência no ar." },
   { title: "Estrutura para o próximo passo", description: "Componentes reutilizáveis e organização de código para facilitar manutenção e evolução." },
