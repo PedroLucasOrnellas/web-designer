@@ -128,6 +128,7 @@ export const faqs = [
 // Configure o endereço definitivo (mailto:, WhatsApp ou agenda) antes de publicar.
 // O fallback mantém o destino centralizado, sem inventar um canal de contato.
 export const contactUrl = process.env.NEXT_PUBLIC_CONTACT_URL?.trim() || "/#contato";
+export const contactIsConfigured = Boolean(process.env.NEXT_PUBLIC_CONTACT_URL?.trim());
 
 // Substitua os valores abaixo pelos seus links reais antes da publicação definitiva.
 export const socialLinks: SocialLink[] = [

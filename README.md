@@ -5,7 +5,7 @@ Home comercial em React e TypeScript, preservando Next.js/Vinext, GSAP, fontes e
 ## Conteúdo e contato
 
 Edite data/portfolio.ts para projetos, quatro soluções, diferenciais, cinco etapas, FAQ e redes sociais.
-Configure NEXT_PUBLIC_CONTACT_URL no ambiente local (.env.local) e no ambiente de produção, com a URL definitiva de WhatsApp, agenda ou mailto:. Reinicie o servidor local após mudar a variável; gere um novo build para produção. Todos os CTAs usam contactUrl, exportado pelo mesmo arquivo. Sem configuração, o destino é /#contato; ainda não há envio de mensagem ou canal definitivo. Links sociais marcados como placeholder não são exibidos.
+Configure NEXT_PUBLIC_CONTACT_URL no ambiente local (.env.local) e no ambiente de produção, com a URL definitiva de WhatsApp, agenda ou mailto:. Reinicie o servidor local após mudar a variável; gere um novo build para produção. Todos os CTAs usam contactUrl, exportado pelo mesmo arquivo. Sem configuração, os CTAs conduzem à seção final, que informa a indisponibilidade do canal e direciona para os cases em vez de criar um link circular. Links sociais marcados como placeholder não são exibidos.
 
 O bloco Sobre usa uma assinatura tipográfica; não exige retrato. A imagem cinematográfica existente permanece em public/images/hero-laptop-cinematic.png.
 

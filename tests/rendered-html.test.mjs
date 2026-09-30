@@ -36,8 +36,12 @@ test("server-renders the progressive portfolio and preserves project destination
   assert.equal((html.match(/<summary/g) ?? []).length, 0);
   assert.match(html, /aria-expanded="true"/);
   assert.match(html, /Solicitar um projeto/);
-  assert.match(html, /Antes da interface, clareza/);
-  assert.match(html, /Um projeto de cada vez/);
+  assert.match(html, /Antes da interface,[\s\S]*clareza sobre o problema/);
+  assert.match(html, /Ideias ganham forma/);
+  assert.match(html, /Antes de começar[\s\S]*seu projeto/);
+  assert.match(html, /O canal direto ainda não está disponível/);
+  assert.match(html, /id="contato"/);
+  assert.match(html, /Conhecer os cases/);
   assert.doesNotMatch(html, /CONTATO PENDENTE|SUBSTITUA|SUBSTITUIR LINKS/);
   for (const slug of ["o-catalogo", "julie-doceria", "the-human-dataset", "epimoni-veiculos"]) {
     assert.ok(html.includes('href="/projetos/' + slug + '"'));

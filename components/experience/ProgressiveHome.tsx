@@ -4,21 +4,14 @@ import Link from "next/link";
 import Image from "next/image";
 import Lenis from "lenis";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { benefits, contactUrl, faqs, processSteps, projects, services } from "@/data/portfolio";
+import { benefits, contactIsConfigured, contactUrl, faqs, processSteps, projects, services } from "@/data/portfolio";
 import { ProjectVisual } from "@/components/ui/ProjectVisual";
 import styles from "./ProgressiveHome.module.css";
 
 const heroProjects = ["epimoni-veiculos", "o-catalogo", "julie-doceria", "the-human-dataset"]
   .map((slug) => projects.find((item) => item.slug === slug)!);
 
-const solutionProblems = [
-  "Sua presença existe, mas ainda não explica com clareza o valor do negócio.",
-  "A oferta chama atenção, mas não conduz naturalmente à próxima ação.",
-  "A operação cresceu, mas as ferramentas não acompanharam a rotina.",
-  "A experiência funciona, mas já não representa a evolução da marca.",
-];
 const lastService = services[services.length - 1];
-
 const cinematicScrollEasing = (progress: number) => {
   const sample = (time: number, first: number, second: number) =>
     ((1 - 3 * second + 3 * first) * time + (3 * second - 6 * first)) * time * time + 3 * first * time;
@@ -45,7 +38,7 @@ export function ProgressiveHome() {
   const [activeProject, setActiveProject] = useState(0);
   const [projectDirection, setProjectDirection] = useState(1);
   const [activeProcess, setActiveProcess] = useState(0);
-  const [activeFaq, setActiveFaq] = useState(0);
+  const [activeFaq, setActiveFaq] = useState(-1);
   const openingRef = useRef<HTMLDivElement>(null);
   const solutionsRef = useRef<HTMLElement>(null);
   const projectsRef = useRef<HTMLElement>(null);
@@ -845,16 +838,10 @@ export function ProgressiveHome() {
         <div className={styles.solutionsInner}>
         <div className={styles.sectionIntro}>
           <StepLabel>03 / ENCONTRAR DIREÇÃO</StepLabel>
-          <h2 id="solutions-title">O problema raramente<br />é apenas visual.</h2>
-          <p>Estratégia, conteúdo, design e tecnologia precisam responder à mesma necessidade.</p>
-          <div className={styles.problemResponse}>
-            <small>O QUE PRECISA MUDAR</small>
-            <strong key={`problem-copy-${activeService}`}>{solutionProblems[activeService]}</strong>
-            <span key={`problem-response-${activeService}`}><i /> RESPOSTA {services[activeService].index}</span>
-          </div>
+          <h2 id="solutions-title">O que seu projeto<br />precisa agora?</h2>
+          <p>Explore as soluções e encontre a mais próxima do seu objetivo.</p>
         </div>
         <div className={styles.solutionStage}>
-          <div className={styles.solutionProgress} aria-hidden="true"><span>{services[activeService].index} / {String(services.length).padStart(2, "0")}</span><i><b style={{ width: `${((activeService + 1) / services.length) * 100}%` }} /></i></div>
           <div className={styles.serviceAccordion}>
           {services.map((service, index) => {
             const active = activeService === index;
@@ -865,7 +852,6 @@ export function ProgressiveHome() {
               </button>
               <div id={panelId} className={styles.servicePanel} data-open={active} aria-hidden={!active}>
                 <div><p>{service.description}</p>
-                  <div className={styles.serviceDetails}><div><small>O QUE É ENTREGUE</small><span>{service.delivery}</span></div><div><small>PARA O SEU NEGÓCIO</small><span>{service.benefit}</span></div></div>
                   <Link href={contactUrl}>Conversar sobre esta solução <span aria-hidden="true">↗</span></Link>
                 </div>
               </div>
@@ -874,7 +860,6 @@ export function ProgressiveHome() {
           </div>
           <div className={styles.desktopServiceDetails} key={`desktop-service-${activeService}`} aria-live="polite">
             <p>{services[activeService].description}</p>
-            <div className={styles.serviceDetails}><div><small>O QUE É ENTREGUE</small><span>{services[activeService].delivery}</span></div><div><small>PARA O SEU NEGÓCIO</small><span>{services[activeService].benefit}</span></div></div>
             <Link href={contactUrl}>Conversar sobre esta solução <span aria-hidden="true">↗</span></Link>
           </div>
         </div>
@@ -903,6 +888,10 @@ export function ProgressiveHome() {
             <span>{project.index} / {String(projects.length).padStart(2, "0")} · {project.shortCategory}</span>
             <h3>{project.name}</h3>
             <p className={styles.projectLead}>{project.description}</p>
+            <div className={styles.projectStory}>
+              <article><small>DESAFIO</small><p>{project.challenge}</p></article>
+              <article><small>DECISÃO</small><p>{project.decisions}</p></article>
+            </div>
             <Link href={`/projetos/${project.slug}`}>Ver case <span aria-hidden="true">→</span></Link>
           </div>
           <div className={styles.projectVisual} key={`visual-${project.slug}`}><ProjectVisual project={project} /></div>
@@ -919,7 +908,6 @@ export function ProgressiveHome() {
             className={index === activeProject ? styles.isActive : undefined}
             style={{ "--preview-color": item.accent } as React.CSSProperties}
             onMouseEnter={() => selectProject(index)}
-            onFocus={() => selectProject(index)}
             onClick={() => selectProject(index)}
             aria-label={`Mostrar ${item.name}`}
             aria-pressed={index === activeProject}
@@ -935,6 +923,10 @@ export function ProgressiveHome() {
             <span>{item.index} / {String(projects.length).padStart(2, "0")} · {item.shortCategory}</span>
             <h3>{item.name}</h3>
             <p>{item.description}</p>
+            <div className={styles.projectStory}>
+              <article><small>DESAFIO</small><p>{item.challenge}</p></article>
+              <article><small>DECISÃO</small><p>{item.decisions}</p></article>
+            </div>
             <div className={styles.mobileProjectVisual}><ProjectVisual project={item} /></div>
             <Link href={`/projetos/${item.slug}`}>Ver case <span aria-hidden="true">→</span></Link>
           </article>)}
@@ -992,7 +984,7 @@ export function ProgressiveHome() {
 
       <section ref={faqRef} className={styles.faq} id="faq" aria-labelledby="faq-title" data-faq-accordion>
         <div className={styles.faqInner}>
-        <div className={styles.faqIntro}><StepLabel>07 / TIRAR DÚVIDAS</StepLabel><h2 id="faq-title">Só o que você<br />quiser abrir.</h2><p>As respostas ficam disponíveis sem interromper o fluxo principal.</p></div>
+        <div className={styles.faqIntro}><StepLabel>07 / TIRAR DÚVIDAS</StepLabel><h2 id="faq-title">Antes de começar<br />seu projeto.</h2><p>Entenda como funcionam investimento, prazo, revisões e publicação antes da primeira conversa.</p></div>
         <div className={styles.faqList} data-has-active={activeFaq >= 0}>
           {faqs.map((faq, index) => {
             const active = activeFaq === index;
@@ -1005,12 +997,17 @@ export function ProgressiveHome() {
         </div>
       </section>
 
-      <section ref={contactRef} className={styles.contactStage} id="contato" aria-labelledby="contact-title">
+      <section ref={contactRef} className={styles.contactStage} aria-labelledby="contact-title">
+        <span id="contato" className={styles.contactAnchor} aria-hidden="true" />
         <div className={styles.contact}>
           <StepLabel>08 / CONVERSAR</StepLabel>
           <h2 id="contact-title"><span>Tem um site, sistema</span><span>ou ideia para tirar</span><span>do papel?</span></h2>
-          <p>Conte brevemente o que você precisa e receba uma direção inicial para o projeto.</p>
-          <Link href={contactUrl}>Conversar sobre o projeto <span aria-hidden="true">↗</span></Link>
+          <p>{contactIsConfigured
+            ? "Conte brevemente o que você precisa e receba uma direção inicial para o projeto."
+            : "O canal direto ainda não está disponível. Enquanto isso, conheça os cases e veja como cada projeto foi construído."}</p>
+          <Link href={contactIsConfigured ? contactUrl : "#projetos"}>
+            {contactIsConfigured ? "Conversar sobre o projeto" : "Conhecer os cases"} <span aria-hidden="true">↗</span>
+          </Link>
         </div>
       </section>
     </main>
